@@ -1,0 +1,26 @@
+{
+    "id": "2A3474D7",
+    "path": "C:/work/Code/PBPK/Mouse/fitting.R",
+    "project_path": "fitting.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1707233830366.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "source_window_id": "",
+        "Source": "Source",
+        "cursorPosition": "520,10",
+        "scrollLine": "460"
+    },
+    "folds": "15|51|77|0|\n78|62|125|0|\n88|30|124|0|\n126|24|194|0|\n195|35|251|0|\n241|29|245|0|\n252|67|307|0|\n315|27|388|0|\n459|25|505|0|\n680|48|732|0|\n792|49|847|0|\n",
+    "lastKnownWriteTime": 1707487765,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1707487765940,
+    "read_only": false,
+    "read_only_alternatives": []
+}
