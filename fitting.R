@@ -295,10 +295,10 @@ plot.A2_Brain=
   geom_point(data = Obs.A2    , aes(Time, CB), size=2.5) + ylab("Concentration") 
 plot.A2_Brain
 
-plot.A2_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2, aes(Time,CG), col="firebrick", lwd=2)
-plot.A2_GI
+#plot.A2_GI=
+#  ggplot() +
+#  geom_line(data  = Fitted_output.A2, aes(Time,CG), col="firebrick", lwd=2)
+#plot.A2_GI
 
 
 
@@ -560,7 +560,7 @@ quan.mouse = exp(summary(MC.mouse.1)$quantiles)
 
 ## Trace plot using bayes plot
 ## Convergences plot
-color_scheme_set("black")
+color_scheme_set("blue")
 mcmc_trace (
   combinedchains,
   pars =names(theta.MCMC[1:17]),
@@ -582,48 +582,167 @@ saveRDS(combinedchains,file='mouse.comb.rds')
 Sim.fit.MCMC.B = mcmc.fun (par = MCMC[[1]]$bestpar,pred=TRUE)
 
 df.sim.MCMC.B = cbind.data.frame (Time=Sim.fit.MCMC.B$Time, 
-                                  CA=Sim.fit.MCMC.B$CA, 
                                   CL=Sim.fit.MCMC.B$CL,
-                                  CK=Sim.fit.MCMC.B$CK,
-                                  Curine=Sim.fit.MCMC.B$Curine)
+                                  CK=Sim.fit.MCMC.B$CK)
 
-plot.B1 =
-  ggplot() +
-  geom_line(data = df.sim.MCMC.B,aes(Time,CA), col="firebrick", lwd=2)+
-  geom_point(data = Obs.B1 ,aes(Time, CA),size=2.5) + ylab("Concentration") 
+
 
 
 plot.B2 =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.B2 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
+  geom_point(data = Obs.A2 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
 
 plot.B3 =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.B3 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
+  geom_point(data = Obs.A2 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
 
-plot.B4=
-  ggplot() +
-  geom_line(data = df.sim.MCMC.B,aes(Time,Curine), col="firebrick", lwd=2)+
-  geom_point(data = Obs.B4 ,aes(Time, Curine),size=2.5) + ylab("Concentration")
 
-plot.B1
+
 plot.B2
 plot.B3
-plot.B4
+
+Newtime.r   = pred.mouse(theta.MCMC)$Time  
+# this is the new time variable, now it has been changed to sample per day.
+nrwo.r = length (Newtime.r)
+
+MC.mouse.a.CL    = matrix(nrow = nrwo.r, ncol = 5000)
+MC.mouse.a.CK    = matrix(nrow = nrwo.r, ncol = 5000)
+MC.mouse.a.Clung    = matrix(nrow = nrwo.r, ncol = 5000)
+MC.mouse.a.CS    = matrix(nrow = nrwo.r, ncol = 5000)
+
+for(i in 1:500){
+  
+  j = i *10  
+  pars.mouse             = MCMC[[1]]$pars    [j,]     # sample parameter set once every ten sets, so you will have 5000 sets from 50000 total sets
+  
+  MCdata               = pred.mouse (pars.mouse)
+  MC.mouse.a.CL[,i]= MCdata$CL
+  MC.mouse.a.CK[,i]= MCdata$CK
+  MC.mouse.a.Clung[,i]= MCdata$Clung
+  MC.mouse.a.CS[,i]= MCdata$CS
+  cat("iteration = ", i , "\n") # Shows the progress of iterations, so you can see the number of iterations that has been completed, and how many left.
+}
+
+M.mouse.a.CL  = MC.mouse.a.CL %>% apply(1,mean) # get the mean value of MC.rat.a.CA
+SD.mouse.a.CL = MC.mouse.a.CL %>% apply(1,sd)
+M.mouse.a.CK  = MC.mouse.a.CK %>% apply(1,mean) # get the mean value of MC.rat.a.CA
+SD.mouse.a.CK = MC.mouse.a.CK %>% apply(1,sd)
+M.mouse.a.Clung  = MC.mouse.a.Clung %>% apply(1,mean) # get the mean value of MC.rat.a.CA
+SD.mouse.a.Clung = MC.mouse.a.Clung %>% apply(1,sd)
+M.mouse.a.CS  = MC.mouse.a.CS %>% apply(1,mean) # get the mean value of MC.rat.a.CA
+SD.mouse.a.CS = MC.mouse.a.CS %>% apply(1,sd)
+
+
+
+MC.mouse.CL.plot <- cbind(
+  Time = Newtime.r, 
+  as.data.frame(t(apply(MC.mouse.a.CL, 1, function(y_est) c(
+    median_est         = median(y_est,na.rm = T), 
+    ci_q1              = quantile(y_est, probs = 0.25, names = FALSE,na.rm = T), 
+    ci_q3              = quantile(y_est, probs = 0.75, names = FALSE,na.rm = T),
+    ci_10              = quantile(y_est, probs = 0.1, names = FALSE,na.rm = T), 
+    ci_90              = quantile(y_est, probs = 0.9, names = FALSE,na.rm = T),
+    ci_lower_est       = quantile(y_est, probs = 0.025, names = FALSE,na.rm = T),  
+    ci_upper_est       = quantile(y_est, probs = 0.975, names = FALSE,na.rm = T)  
+  ))))
+)
+MC.mouse.CK.plot <- cbind(
+  Time = Newtime.r, 
+  as.data.frame(t(apply(MC.mouse.a.CK, 1, function(y_est) c(
+    median_est         = median(y_est,na.rm = T), 
+    ci_q1              = quantile(y_est, probs = 0.25, names = FALSE,na.rm = T), 
+    ci_q3              = quantile(y_est, probs = 0.75, names = FALSE,na.rm = T),
+    ci_10              = quantile(y_est, probs = 0.1, names = FALSE,na.rm = T), 
+    ci_90              = quantile(y_est, probs = 0.9, names = FALSE,na.rm = T),
+    ci_lower_est       = quantile(y_est, probs = 0.025, names = FALSE,na.rm = T),  
+    ci_upper_est       = quantile(y_est, probs = 0.975, names = FALSE,na.rm = T)  
+  ))))
+)
+MC.mouse.Clung.plot <- cbind(
+  Time = Newtime.r, 
+  as.data.frame(t(apply(MC.mouse.a.Clung, 1, function(y_est) c(
+    median_est         = median(y_est,na.rm = T), 
+    ci_q1              = quantile(y_est, probs = 0.25, names = FALSE,na.rm = T), 
+    ci_q3              = quantile(y_est, probs = 0.75, names = FALSE,na.rm = T),
+    ci_10              = quantile(y_est, probs = 0.1, names = FALSE,na.rm = T), 
+    ci_90              = quantile(y_est, probs = 0.9, names = FALSE,na.rm = T),
+    ci_lower_est       = quantile(y_est, probs = 0.025, names = FALSE,na.rm = T),  
+    ci_upper_est       = quantile(y_est, probs = 0.975, names = FALSE,na.rm = T)  
+  ))))
+)
+
+
+MC.mouse.CS.plot <- cbind(
+  Time = Newtime.r, 
+  as.data.frame(t(apply(MC.mouse.a.CS, 1, function(y_est) c(
+    median_est         = median(y_est,na.rm = T), 
+    ci_q1              = quantile(y_est, probs = 0.25, names = FALSE,na.rm = T), 
+    ci_q3              = quantile(y_est, probs = 0.75, names = FALSE,na.rm = T),
+    ci_10              = quantile(y_est, probs = 0.1, names = FALSE,na.rm = T), 
+    ci_90              = quantile(y_est, probs = 0.9, names = FALSE,na.rm = T),
+    ci_lower_est       = quantile(y_est, probs = 0.025, names = FALSE,na.rm = T),  
+    ci_upper_est       = quantile(y_est, probs = 0.975, names = FALSE,na.rm = T)  
+  ))))
+)
 
 
 
 
+p2.r.L <- 
+  ggplot() + 
+  geom_ribbon(data = MC.mouse.CL.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
+              fill="yellowgreen", alpha=0.3) +
+  geom_ribbon(data = MC.mouse.CL.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
+              fill="green4", alpha = 0.3) +
+  geom_line(data= MC.mouse.CL.plot, aes(x = Time, y = median_est), 
+            size = rel(1), colour = "lightgreen") +
+  geom_line(data= MC.mouse.CL.plot, aes(x = Time, y = median_est), 
+            colour = "black") +
+  geom_point(data=Obs.A1, aes(x=Time, y= CL), shape = 1, colour = "black", 
+             fill = "white", size = 3, stroke = 2) 
 
+p2.r.L
 
+p2.r.K <- 
+  ggplot() + 
+  geom_ribbon(data = MC.mouse.CK.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
+              fill="yellowgreen", alpha=0.3) +
+  geom_ribbon(data = MC.mouse.CK.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
+              fill="green4", alpha = 0.3) +
+  geom_line(data= MC.mouse.CK.plot, aes(x = Time, y = median_est), 
+            size = rel(1), colour = "lightgreen") +
+  geom_line(data= MC.mouse.CK.plot, aes(x = Time, y = median_est), 
+            colour = "black") +
+  geom_point(data=Obs.A1, aes(x=Time, y= CK), shape = 1, colour = "black", 
+             fill = "white", size = 3, stroke = 2) 
 
+p2.r.lung <- 
+  ggplot() + 
+  geom_ribbon(data = MC.mouse.Clung.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
+              fill="yellowgreen", alpha=0.3) +
+  geom_ribbon(data = MC.mouse.Clung.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
+              fill="green4", alpha = 0.3) +
+  geom_line(data= MC.mouse.Clung.plot, aes(x = Time, y = median_est), 
+            size = rel(1), colour = "lightgreen") +
+  geom_line(data= MC.mouse.Clung.plot, aes(x = Time, y = median_est), 
+            colour = "black") +
+  geom_point(data=Obs.A1, aes(x=Time, y= Clung), shape = 1, colour = "black", 
+             fill = "white", size = 3, stroke = 2) 
 
-
-
-
-
+p2.r.S <- 
+  ggplot() + 
+  geom_ribbon(data = MC.mouse.CS.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
+              fill="yellowgreen", alpha=0.3) +
+  geom_ribbon(data = MC.mouse.CS.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
+              fill="green4", alpha = 0.3) +
+  geom_line(data= MC.mouse.CS.plot, aes(x = Time, y = median_est), 
+            size = rel(1), colour = "lightgreen") +
+  geom_line(data= MC.mouse.CS.plot, aes(x = Time, y = median_est), 
+            colour = "black") +
+  geom_point(data=Obs.A1, aes(x=Time, y= CS), shape = 1, colour = "black", 
+             fill = "white", size = 3, stroke = 2) 
 
 #-------------------------------------Fitting with A1 dataset---------------
 Obs.A1 <- read.csv(file ="C:/switchdriver/dataset/tk/mouse/R_input_mouse_study1_4nm.csv")
