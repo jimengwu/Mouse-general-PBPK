@@ -31,7 +31,7 @@ ex.iv<- ev(ID=1, amt= DOSE,                      ## Set up the exposure events
            cmt="MBV", replicate = FALSE) 
 
 ## Set up the exposure time
-tsamp=tgrid(0,tinterval*(TDoses-1)+24*10,tinterval)     ## Simulation time 24*180 hours (180 days)
+tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,tinterval)     ## Simulation time 24*7 hours (180 days)
 
 ## calculate the deposition volume
 out <- 
@@ -60,17 +60,17 @@ mean(out$mtot) # check the mass balance
 
 # first result plotting
 
-Obs.A1 <- read.csv(file ="C:/switchdriver/dataset/tk/mouse/R_input_mouse_study1_13nm_short.csv")  
+Obs.A1 <- read.csv(file ="C:/work/Code/PBPK/Mouse/dataset/tk/mouse/R_input_mouse_study1_100nm_short.csv")  
 
-plot (y=out$CL, x=out$Time,xlab = "Time", main = "Liver concentration-13nm",
+plot (y=out$CL, x=out$Time,xlab = "Time", main = "Liver concentration-100nm",
       type='l',log="x")
-plot (y=out$CLt, x=out$Time,xlab = "Time", main = "Liver Tissue concentration-13nm",
-      type='l',log="x",xlim=c(0.1,1000),ylim=c(0,10000))
-plot (y=out$CSt, x=out$Time,xlab = "Time", main = "Spleen Tissue concentration-13nm",
+plot (y=out$CLt, x=out$Time,xlab = "Time", main = "Liver Tissue concentration-100nm",
+      type='l',log="x")
+plot (y=out$CSt, x=out$Time,xlab = "Time", main = "Spleen Tissue concentration-100nm",
       type='l',log="x",xlim=c(0.1,1000),ylim=c(0,50000))
-plot (y=out$CKt, x=out$Time,xlab = "Time", main = "Kidney Tissue concentration-13nm",
+plot (y=out$CKt, x=out$Time,xlab = "Time", main = "Kidney Tissue concentration-100nm",
       type='l',log="x",xlim=c(0.1,1000),ylim=c(0,1500))
-plot (y=out$CLungt, x=out$Time,xlab = "Time", main = "Lung Tissue concentration-13nm",
+plot (y=out$CLungt, x=out$Time,xlab = "Time", main = "Lung Tissue concentration-100nm",
       type='l',log="x",xlim=c(0.1,1000),ylim=c(0,1500))
 
 
@@ -103,7 +103,7 @@ pred.mouse <- function(pars) {
             cmt="MBV", replicate = FALSE) 
 
     ## Set up the exposure time
-    tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,1)     ## Simulation time 24*180 hours (180 days)
+    tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,1)     ## Simulation time 24*7 hours (180 days)
 
     ## calculate the deposition volume
     out <- 
@@ -168,7 +168,7 @@ params.init <- log(c(
 
 
 
-##-------Local sensitivity analysis
+##-------Local sensitivity analysis----
 # Choose the sensitive parameters in the model
 
 ## Sensitivity function (FME)
@@ -251,49 +251,61 @@ MCcost<-function (pars, obs){
 
 
 #------------------3. Fitting with A2 dataset using modFit function-----------------------------
-Obs.A2 <- read.csv(file ="C:/switchdriver/dataset/tk/mouse/R_input_mouse_study1_13nm_short.csv")  
-Fit.Result.A2<- modFit(f=MCcost, p=params2fit, obs=Obs.A2, method ="Nelder-Mead", 
+
+Fit.Result.A1<- modFit(f=MCcost, p=params2fit, obs=Obs.A1, method ="Nelder-Mead", 
                        control = nls.lm.control(nprint=1)) #"Nelder-Mead"
 
-summary(Fit.Result.A2)                           ## Summary of fit
+summary(Fit.Result.A1)                           ## Summary of fit
 #exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A2=MCcost(Fit.Result.A2$par, obs=Obs.A2)$residuals$res      ## Check the residual for each time points
-sum(res.A2^2)                                    ## Total residuals 
+res.A1=MCcost(Fit.Result.A1$par, obs=Obs.A1)$residuals$res      ## Check the residual for each time points
+sum(res.A1^2)                                    ## Total residuals 
 
 # Calculated the model output with fitted parameters
-Fitted_output.A2 = pred.mouse(par=Fit.Result.A2$par)
+Fitted_output.A1 = pred.mouse(par=Fit.Result.A1$par)
 
-plot.A2=
+plot.A1=
   ggplot() +
-  geom_line(data  = Fitted_output.A2, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_line(data  = Fitted_output.A2_2, aes(Time,CL), col="GREEN", lwd=1)+
-  geom_point(data = Obs.A2    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot.A2
+  geom_line(data  = Fitted_output.A1, aes(Time,CL), col="firebrick", lwd=2)+
+  geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + 
+  ylab("Concentration in Liver (ng/g)")
+plot.A1
+ggsave("plots/init_fit_liver.png")
 
-plot.A2_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_line(data  = Fitted_output.A2_2, aes(Time,Clung), col="GREEN", lwd=1)+
-  geom_point(data = Obs.A2    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A2_Lung
 
-plot.A2_Kidney=
+plot.A1_Lung=
   ggplot() +
-  geom_line(data  = Fitted_output.A2, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot.A2_Kidney
+  geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="firebrick", lwd=2)+
+  geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="GREEN", lwd=1)+
+  geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + 
+  ylab("Concentration in Lung (ng/g) ") 
+plot.A1_Lung
+ggsave("plots/init_fit_lung.png")
 
-plot.A2_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot.A2_Spleen
 
-plot.A2_Brain=
+plot.A1_Kidney=
   ggplot() +
-  geom_line(data  = Fitted_output.A2, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A2_Brain
+  geom_line(data  = Fitted_output.A1, aes(Time,CK), col="firebrick", lwd=2)+
+  geom_point(data = Obs.A1    , aes(Time, CK), size=2.5) + 
+  ylab("Concentration in Kidney (ng/g)") 
+plot.A1_Kidney
+ggsave("plots/init_fit_kidney.png")
+
+plot.A1_Spleen=
+  ggplot() +
+  geom_line(data  = Fitted_output.A1, aes(Time,CS), col="firebrick", lwd=2)+
+  geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + 
+  ylab("Concentration in Spleen (ng/g)") 
+plot.A1_Spleen
+ggsave("plots/init_fit_spleen.png")
+
+
+plot.A1_Brain=
+  ggplot() +
+  geom_line(data  = Fitted_output.A1, aes(Time,CB), col="firebrick", lwd=2)+
+  geom_point(data = Obs.A1    , aes(Time, CB), size=2.5) + 
+  ylab("Concentration in Brain (ng/g)") 
+plot.A1_Brain
+ggsave("plots/init_fit_brain.png")
 
 #plot.A2_GI=
 #  ggplot() +
@@ -407,7 +419,7 @@ mcmc.fun <- function (pars, pred=FALSE){
              cmt="MBV", replicate = FALSE) 
   
   ## set up the exposure time
-  tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,1)     ## Simulation time 24*180 hours (180 days)
+  tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,1)     ## Simulation time 24*7 hours (180 days)
   
   
   ## Get a prediction
@@ -456,7 +468,6 @@ mcmc.fun <- function (pars, pred=FALSE){
 
 ## Define the Prior distributions: either normal or log normal distribution
 ## normal distribution
-## normal distribution
 Prior <- function(pars) {
   
   ## Population level
@@ -477,12 +488,12 @@ Prior <- function(pars) {
   
   # The likelihood for population variance; P(sigmal^2|sigmal0^2)
   CU             = 1                                              # Coefficient of uncertainty (CU) (Hack et al., 2006)
-  CV.sig         = exp(theta.MCMC[which_sig])[2:18]               # Singmal0
-  alpha          = (2+1)/(CU^2)                                   # Shape parametrer of gamma distribution; Appendix Table A-7 from EPA (2011) :EPA/635/R-09/011F
+  CV.sig         = exp(theta.MCMC[which_sig])[2:18]               # Sigmal0
+  alpha          = (2+1)/(CU^2)                                   # Shape parameter  of gamma distribution; Appendix Table A-7 from EPA (2011) :EPA/635/R-09/011F
   beta           = (alpha-1)*CV.sig^2                             # Scale parameter  of gamma distribution; Appendix Table A-7 from EPA (2011) :EPA/635/R-09/011F
   
   # Calculate likelihoods of model error (sig2) and population variance (sig) parameters
-  prior_sig      = dinvgamma (sig, shape = alpha , scale = beta)  # prior distribution for population vraicne; sigma2
+  prior_sig      = dinvgamma (sig, shape = alpha , scale = beta)  # prior distribution for population variance; sigma2
   prior_sig2     = dunif (sig2, min = 0.01, max = 3.3)            # error variances, Lower and upper boundary from Chiu et al., 2009; Chiu et al., 2014)   
   
   ## individual level; P(theta|u,sigmal^2)
@@ -499,7 +510,7 @@ Prior <- function(pars) {
   log.pri.pars.i = log (prior_pars_i)
   log.pri.sig2   = log (prior_sig2)
   
-  # maximau likelihood estimation (MLE): negative log-likelihood function, (-2 times sum of log-likelihoods)
+  # maximum likelihood estimation (MLE): negative log-likelihood function, (-2 times sum of log-likelihoods)
   MLE =  -2*sum(log.pri.pars, log.pri.sig , log.pri.pars.i,log.pri.sig2)  
   
   return(MLE)
@@ -517,10 +528,9 @@ registerDoParallel(cl)                       ## registers a cluster of all the c
 # start time
 strt<-Sys.time()
 
-
 # parallel
 system.time(
-  MCMC <- foreach( i = 1:4, .packages = c('mrgsolve','magrittr','FME',
+  MCMC_100nm <- foreach( i = 1:4, .packages = c('mrgsolve','magrittr','FME',
                                           'truncnorm','EnvStats',
                                           'invgamma','dplyr')) %dopar% {
                                             mod <- mcode ("micepbpk", mousePBPK.code)
@@ -538,25 +548,25 @@ system.time(
                                             
                                           }
 )
-
+endt<-Sys.time()
 
 #end time
-print(Sys.time()-strt)
+print(endt-strt)
 
 stopCluster(cl)   
 
 
 ## Performance four chains to check the convergences
-MC.mouse.1 = as.mcmc (MCMC[[1]]$pars) # first  chain
-MC.mouse.2 = as.mcmc (MCMC[[2]]$pars) # second chain
-MC.mouse.3 = as.mcmc (MCMC[[3]]$pars) # third  chain
-MC.mouse.4 = as.mcmc (MCMC[[4]]$pars) # fourth chain
+MC.mouse_100nm.1 = as.mcmc (MCMC_100nm[[1]]$pars) # first  chain
+MC.mouse_100nm.2 = as.mcmc (MCMC_100nm[[2]]$pars) # second chain
+MC.mouse_100nm.3 = as.mcmc (MCMC_100nm[[3]]$pars) # third  chain
+MC.mouse_100nm.4 = as.mcmc (MCMC_100nm[[4]]$pars) # fourth chain
 
-combinedchains = mcmc.list(MC.mouse.1,MC.mouse.2,MC.mouse.3,MC.mouse.4) ## combine all chains
+combinedchains = mcmc.list(MC.mouse_100nm.1,MC.mouse_100nm.2,MC.mouse_100nm.3,MC.mouse_100nm.4) ## combine all chains
 gelman.diag (combinedchains)          # Gel man convergence diagnosis
 
 ## Save the posterior parameters (95% CI)
-quan.mouse = exp(summary(MC.mouse.1)$quantiles)  
+quan.mouse = exp(summary(MC.mouse_100nm.1)$quantiles)  
 
 ## Trace plot using bayes plot
 ## Convergences plot
@@ -565,20 +575,20 @@ mcmc_trace (
   combinedchains,
   pars =names(theta.MCMC[1:17]),
   size = 0.5,
-  facet_args = list(nrow = 2)) +
+  facet_args = list(nrow = 5)) +
   ggplot2::scale_color_brewer()
 
 
 
 # output the MCMC results
 write.csv(quan.mouse,file="mouse.summary_pos.csv")
-write.csv(MC.mouse.1,file="mouse.pos.csv")
-saveRDS(MCMC[[1]],file ='mouse.MCMC.rds')
+write.csv(MC.mouse_100nm.1,file="mouse.pos.csv")
+saveRDS(MCMC_100nm[[1]],file ='mouse.MCMC.rds')
 saveRDS(combinedchains,file='mouse.comb.rds')
 
 
-## Plot using MCMC parameters
-## MOdel validation using positerir parametesr
+## Plot using MCMC posterior parameters
+## Model validation using one of the best posterior parameter combination
 Sim.fit.MCMC.B = mcmc.fun (par = MCMC[[1]]$bestpar,pred=TRUE)
 
 df.sim.MCMC.B = cbind.data.frame (Time=Sim.fit.MCMC.B$Time, 
@@ -586,23 +596,101 @@ df.sim.MCMC.B = cbind.data.frame (Time=Sim.fit.MCMC.B$Time,
                                   CK=Sim.fit.MCMC.B$CK)
 
 
-
-
-plot.B2 =
+plot.BL =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CL), col="firebrick", lwd=2)+
   geom_point(data = Obs.A2 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
 
-plot.B3 =
+plot.BK =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CK), col="firebrick", lwd=2)+
   geom_point(data = Obs.A2 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
+saveRDS(theta.MCMC,file ='theta.names.rds')
+
+#--------------------------------------plots-------------------------
+#--------------------1. Densities of posterior parameter uncertainty distributions of the population mean (μ). ----------
+
+Mouse.MCMC        <- readRDS(file = "results/mouse.MCMC.rds")
+
+## loading the theta names
+theta.names       <- readRDS(file = "theta.names.rds")
+## Sampling from posterior parameters to generate the posterior distributions 
+## Mouse posteiror distributions
+M.Mouse  <- exp(Mouse.MCMC$pars) %>% apply(2,mean)
+SD.Mouse <- exp(Mouse.MCMC$pars) %>% apply(2,sd)
+dis.Mouse <- matrix(ncol = 50000, nrow = 30)
+rownames(dis.Mouse) <- names(M.Mouse)[1:30]
+
+for (i in 1:50000){
+  for (j in 1:30){
+    dis.Mouse[j,i] <- rnorm (1, mean = M.Mouse[j], sd= SD.Mouse[j])
+  }
+}
+
+dis.Mouse<-melt(dis.Mouse)
+names(dis.Mouse)=c("Par","Species","Value")
+dis.Mouse$Species = c("Mouse")
+
+## Summary the mouse, rat, monkey, and human posterior distribution in the "Pos.mean" object
+Pos.mean <- rbind.data.frame (dis.Mouse)
+Pos.mean$log.value <- log(Pos.mean$Value)
+
+## Fig. 3: Densities of posterior parameter uncertainty distributions
+## P1: All species gather together in one plot
+windowsFonts(Times=windowsFont("Times New Roman")) # Abbreviate the font Times New Roman as Times
+Pos.mean$ggjoy = c("A") # Create a new column ggjoy in Pos.mean table. Without this, 
+# the plot p1 will have four layers for four species overlapped in each panel, which does not look good.
+
+# With this, y axis is A for all species in one layer in one panel.
+
+Pos.mean$Par = factor(Pos.mean$Par, levels = theta.names[1:30])
+library(ggjoy)     # Used to create Figure 3
+p1 = 
+  ggplot (Pos.mean, aes(x = as.numeric(log.value), y = as.factor(ggjoy),fill = Species)) + # fill, fill one color for each species
+  geom_joy (scale = 8, size = 0.25, rel_min_height = 0.01, alpha = 0.4) + # over size of the entire ggjoy plot
+  #geom_joy (data=filter(Pos.mean, Species == "Monkey"),scale = 28, size = 0.25, rel_min_height = 0.01, fill="red", alpha=0.3) +
+  #geom_joy (data=filter(Pos.mean, Species == "Mouse"), scale = 8, size = 0.25, rel_min_height = 0.01, fill="green", alpha=0.3) +
+  #geom_joy (data=filter(Pos.mean, Species == "Rat"),   scale = 28, size = 0.25, rel_min_height = 0.01, fill="pink", alpha=0.3)+
+  scale_fill_manual(values = c("pink", "grey", "blue","red")) + 
+  scale_colour_manual(values = c("pink", "grey", "blue","red"))+ 
+  facet_wrap ( ~ Par, nrow = 6, ncol= 5,scale="free_x") # arrange the plot by parameter name, free_x means that the x scale is not fixed, so automatically updated.
+
+p1=
+  p1 + theme_joy()+ # change the theme of the plot p1 (incorporate p1 into the theme)
+  theme (
+    plot.background         = element_blank(),
+    text                    = element_text (family = "Times",face="bold",size = 18),
+    #panel.border            = element_rect (colour = "black", fill=NA, size=2),
+    #panel.background        = element_blank(),
+    panel.background        = element_rect (fill   = "#f7f7f7"),
+    #panel.grid.major.y      = element_line (size   = 0.5, colour = "grey"),
+    #panel.grid.minor.y      = element_blank(),
+    panel.grid.major.x      = element_blank(), 
+    #panel.grid.minor.x      = element_blank(), 
+    #axis.text               = element_text (size   = 18, colour = "black",face="bold"),  
+    axis.title              = element_text (size   = 18, colour = "black", face = "bold"),   # label of axes
+    axis.ticks.x            = element_line (size   = 1.5, colour = "black"), 
+    axis.ticks.y            = element_blank(), 
+    axis.text.y             = element_blank(),
+    strip.text              = element_text (size   = 18),
+    legend.title            = element_text (size   = 18, face="bold"),
+    legend.justification    = "none",
+    legend.position         = "none",
+    legend.text             = element_text (size = 18,face="bold")) + 
+  labs (x = "", y = "") 
+
+# Save the image by using the Export button, adjust the height and width, choose image format, preview
+ggsave("Fig.3.tiff",scale = 1,
+       plot = p1,
+       path = "plots/",
+       width = 25, height = 20, units = "cm",dpi=320)
+
+
+dev.off()
 
 
 
-plot.B2
-plot.B3
-
+#-----------------------------2. get sensitivity range plots-------------
 Newtime.r   = pred.mouse(theta.MCMC)$Time  
 # this is the new time variable, now it has been changed to sample per day.
 nrwo.r = length (Newtime.r)
@@ -611,6 +699,7 @@ MC.mouse.a.CL    = matrix(nrow = nrwo.r, ncol = 5000)
 MC.mouse.a.CK    = matrix(nrow = nrwo.r, ncol = 5000)
 MC.mouse.a.Clung    = matrix(nrow = nrwo.r, ncol = 5000)
 MC.mouse.a.CS    = matrix(nrow = nrwo.r, ncol = 5000)
+MC.mouse.a.CB    = matrix(nrow = nrwo.r, ncol = 5000)
 
 for(i in 1:500){
   
@@ -622,6 +711,7 @@ for(i in 1:500){
   MC.mouse.a.CK[,i]= MCdata$CK
   MC.mouse.a.Clung[,i]= MCdata$Clung
   MC.mouse.a.CS[,i]= MCdata$CS
+  MC.mouse.a.CB[,i]= MCdata$CB
   cat("iteration = ", i , "\n") # Shows the progress of iterations, so you can see the number of iterations that has been completed, and how many left.
 }
 
@@ -633,6 +723,8 @@ M.mouse.a.Clung  = MC.mouse.a.Clung %>% apply(1,mean) # get the mean value of MC
 SD.mouse.a.Clung = MC.mouse.a.Clung %>% apply(1,sd)
 M.mouse.a.CS  = MC.mouse.a.CS %>% apply(1,mean) # get the mean value of MC.rat.a.CA
 SD.mouse.a.CS = MC.mouse.a.CS %>% apply(1,sd)
+M.mouse.a.CB  = MC.mouse.a.CB %>% apply(1,mean) # get the mean value of MC.rat.a.CA
+SD.mouse.a.CB = MC.mouse.a.CB %>% apply(1,sd)
 
 
 
@@ -687,38 +779,54 @@ MC.mouse.CS.plot <- cbind(
   ))))
 )
 
+MC.mouse.CB.plot <- cbind(
+  Time = Newtime.r, 
+  as.data.frame(t(apply(MC.mouse.a.CB, 1, function(y_est) c(
+    median_est         = median(y_est,na.rm = T), 
+    ci_q1              = quantile(y_est, probs = 0.25, names = FALSE,na.rm = T), 
+    ci_q3              = quantile(y_est, probs = 0.75, names = FALSE,na.rm = T),
+    ci_10              = quantile(y_est, probs = 0.1, names = FALSE,na.rm = T), 
+    ci_90              = quantile(y_est, probs = 0.9, names = FALSE,na.rm = T),
+    ci_lower_est       = quantile(y_est, probs = 0.025, names = FALSE,na.rm = T),  
+    ci_upper_est       = quantile(y_est, probs = 0.975, names = FALSE,na.rm = T)  
+  ))))
+)
 
 
 
-p2.r.L <- 
+p1.r.L <- 
   ggplot() + 
   geom_ribbon(data = MC.mouse.CL.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
               fill="yellowgreen", alpha=0.3) +
   geom_ribbon(data = MC.mouse.CL.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
               fill="green4", alpha = 0.3) +
   geom_line(data= MC.mouse.CL.plot, aes(x = Time, y = median_est), 
-            size = rel(1), colour = "lightgreen") +
-  geom_line(data= MC.mouse.CL.plot, aes(x = Time, y = median_est), 
-            colour = "black") +
+            size = rel(1), colour = "green3") +
+
   geom_point(data=Obs.A1, aes(x=Time, y= CL), shape = 1, colour = "black", 
-             fill = "white", size = 3, stroke = 2) 
+             fill = "white", size = 1, stroke = 2) +
+  ylab("Concentration in Liver (ng/g)") + xlab("Time (h)")
+p1.r.L
+ggsave("plots/MCMC_fit_liver.png")
 
-p2.r.L
+p1.r.L
 
-p2.r.K <- 
+p1.r.K <- 
   ggplot() + 
   geom_ribbon(data = MC.mouse.CK.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
               fill="yellowgreen", alpha=0.3) +
   geom_ribbon(data = MC.mouse.CK.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
               fill="green4", alpha = 0.3) +
   geom_line(data= MC.mouse.CK.plot, aes(x = Time, y = median_est), 
-            size = rel(1), colour = "lightgreen") +
-  geom_line(data= MC.mouse.CK.plot, aes(x = Time, y = median_est), 
-            colour = "black") +
+            size = rel(1), colour = "green3") +
   geom_point(data=Obs.A1, aes(x=Time, y= CK), shape = 1, colour = "black", 
-             fill = "white", size = 3, stroke = 2) 
+             fill = "white", size = 3, stroke = 2) +
+  ylab("Concentration in Kidney (ng/g)") + xlab("Time (h)")
+p1.r.K
+ggsave("plots/MCMC_fit_Kidney.png")
 
-p2.r.lung <- 
+
+p1.r.lung <- 
   ggplot() + 
   geom_ribbon(data = MC.mouse.Clung.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
               fill="yellowgreen", alpha=0.3) +
@@ -726,12 +834,13 @@ p2.r.lung <-
               fill="green4", alpha = 0.3) +
   geom_line(data= MC.mouse.Clung.plot, aes(x = Time, y = median_est), 
             size = rel(1), colour = "lightgreen") +
-  geom_line(data= MC.mouse.Clung.plot, aes(x = Time, y = median_est), 
-            colour = "black") +
   geom_point(data=Obs.A1, aes(x=Time, y= Clung), shape = 1, colour = "black", 
-             fill = "white", size = 3, stroke = 2) 
+             fill = "white", size = 3, stroke = 2) +
+  ylab("Concentration in Lung (ng/g)") + xlab("Time (h)")
+ggsave("plots/MCMC_fit_lung.png")
 
-p2.r.S <- 
+
+p1.r.S <- 
   ggplot() + 
   geom_ribbon(data = MC.mouse.CS.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
               fill="yellowgreen", alpha=0.3) +
@@ -739,11 +848,28 @@ p2.r.S <-
               fill="green4", alpha = 0.3) +
   geom_line(data= MC.mouse.CS.plot, aes(x = Time, y = median_est), 
             size = rel(1), colour = "lightgreen") +
-  geom_line(data= MC.mouse.CS.plot, aes(x = Time, y = median_est), 
-            colour = "black") +
   geom_point(data=Obs.A1, aes(x=Time, y= CS), shape = 1, colour = "black", 
-             fill = "white", size = 3, stroke = 2) 
+             fill = "white", size = 3, stroke = 2) +
+  ylab("Concentration in Spleen (ng/g)") + xlab("Time (h)")
+ggsave("plots/MCMC_fit_spleen.png")
 
+p1.r.B <- 
+  ggplot() + 
+  geom_ribbon(data = MC.mouse.CB.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est), 
+              fill="yellowgreen", alpha=0.3) +
+  geom_ribbon(data = MC.mouse.CB.plot, aes(x = Time, ymin = ci_q1, ymax = ci_q3), 
+              fill="green4", alpha = 0.3) +
+  geom_line(data= MC.mouse.CB.plot, aes(x = Time, y = median_est), 
+            size = rel(1), colour = "lightgreen") +
+  geom_point(data=Obs.A1, aes(x=Time, y= CB), shape = 1, colour = "black", 
+             fill = "white", size = 3, stroke = 2) +
+  ylab("Concentration in Brain (ng/g)") + xlab("Time (h)")
+ggsave("plots/MCMC_fit_brain.png")
+
+
+
+
+#----------------------------------------old---------------------------------------------
 #-------------------------------------Fitting with A1 dataset---------------
 Obs.A1 <- read.csv(file ="C:/switchdriver/dataset/tk/mouse/R_input_mouse_study1_4nm.csv")
 
