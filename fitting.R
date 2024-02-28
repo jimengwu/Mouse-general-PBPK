@@ -48,7 +48,6 @@ out <- data.frame(Time=out$time,
                   CKt = out$Kidney_t,
                   CS = out$Spleen,
                   CSt = out$Spleen_t,
-                  CB= out$Brain,
                   CR=out$Rest,
                   Clung = out$Lung,
                   CLungt = out$Lung_t,
@@ -60,31 +59,28 @@ mean(out$mtot) # check the mass balance
 
 # first result plotting
 
-Obs.A1 <- read.csv(file ="C:/work/Code/PBPK/Mouse/dataset/tk/mouse/R_input_mouse_study1_100nm_short.csv")  
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_13nm_short.csv")  
 
-plot (y=out$CL, x=out$Time,xlab = "Time", main = "Liver concentration-100nm",
+nm_size = "13nm"
+
+plot (y=out$CL, x=out$Time,xlab = "Time", main = paste("Liver concentration",nm_size),
       type='l',log="x")
-plot (y=out$CLt, x=out$Time,xlab = "Time", main = "Liver Tissue concentration-100nm",
+plot (y=out$CLt, x=out$Time,xlab = "Time", main = paste("Liver Tissue concentration",nm_size),
       type='l',log="x")
-plot (y=out$CSt, x=out$Time,xlab = "Time", main = "Spleen Tissue concentration-100nm",
+plot (y=out$CSt, x=out$Time,xlab = "Time", main = paste("Spleen Tissue concentration",nm_size),
       type='l',log="x",xlim=c(0.1,1000),ylim=c(0,50000))
-plot (y=out$CKt, x=out$Time,xlab = "Time", main = "Kidney Tissue concentration-100nm",
+plot (y=out$CKt, x=out$Time,xlab = "Time", main = paste("Kidney Tissue concentration",nm_size),
       type='l',log="x",xlim=c(0.1,1000),ylim=c(0,1500))
-plot (y=out$CLungt, x=out$Time,xlab = "Time", main = "Lung Tissue concentration-100nm",
+plot (y=out$CLungt, x=out$Time,xlab = "Time", main = paste("Lung Tissue concentration",nm_size),
       type='l',log="x",xlim=c(0.1,1000),ylim=c(0,1500))
 
 
-
+folder = 'plots/13nm_short/'
 
 #--------------------2. initial parameter sensitivity analysis------------
 ## A1 data set = iv single dose of 0.85 mg/kg; Matrix: plasma; 13nm. 
 ## https://linkinghub.elsevier.com/retrieve/pii/S0041-008X(10)00072-4
 ## A2 data set same as above, but with 100nm
-
-
-#names(Obs.A1)=c("Time", "CL")
-#names(Obs.A2)=c("Time", "CL")
-#names(Obs.A3)=c("Time", "CL")
 
 pred.mouse <- function(pars) {
 
@@ -124,7 +120,7 @@ pred.mouse <- function(pars) {
     return(out)
 }
 
-# 2.1 initial parameters-----------
+## 2.1 initial parameters-----------
 params.init <- log(c(
     K_release_Liver = 0.001,  # h-1
     K_max_Liver = 20,         # h-1
@@ -166,9 +162,7 @@ params.init <- log(c(
 
 
 
-
-
-##-------Local sensitivity analysis----
+### Local sensitivity analysis
 # Choose the sensitive parameters in the model
 
 ## Sensitivity function (FME)
@@ -188,13 +182,21 @@ ggplot(subset(Sens_1,series==c("K_release_Liver","K_max_Liver","K_50_Liver",
        aes(x,value)) + geom_line(aes(colour = series))
 
 df_Sens=summary(Sens)
+
+
+png(paste(folder,"pars_sens.png"))
+
 plot(df_Sens)
+dev.off()
 
 pairs(Sens)
 # ALMOST EVERY PARAMETERS ARE CORRELATED WITH EACH OTHER
 
-# 2.2 selected sensitive parameters-----------------------
-## set up sensitive or necessary parameters as model input
+
+
+
+## --------2.2 selected sensitive parameters-----------------------
+### set up sensitive or necessary parameters as model input
 params2fit <- log(c(
   #K_release_Liver = 0.001,  ## h-1
   #K_max_Liver = 20,  ## h-1
@@ -249,70 +251,63 @@ MCcost<-function (pars, obs){
 
 
 
-
-#------------------3. Fitting with A2 dataset using modFit function-----------------------------
+#------------------3. Fitting with A1 dataset using modFit function-----------------------------
 
 Fit.Result.A1<- modFit(f=MCcost, p=params2fit, obs=Obs.A1, method ="Nelder-Mead", 
                        control = nls.lm.control(nprint=1)) #"Nelder-Mead"
 
 summary(Fit.Result.A1)                           ## Summary of fit
 #exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
+
 res.A1=MCcost(Fit.Result.A1$par, obs=Obs.A1)$residuals$res      ## Check the residual for each time points
 sum(res.A1^2)                                    ## Total residuals 
 
 # Calculated the model output with fitted parameters
 Fitted_output.A1 = pred.mouse(par=Fit.Result.A1$par)
 
+
 plot.A1=
   ggplot() +
   geom_line(data  = Fitted_output.A1, aes(Time,CL), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + 
-  ylab("Concentration in Liver (ng/g)")
+  ylab("Concentration in Liver (ng/g)") +
+  xlab("Time (h)")
 plot.A1
-ggsave("plots/init_fit_liver.png")
+ggsave(paste(folder,"init_fit_liver.png"))
 
 
 plot.A1_Lung=
   ggplot() +
   geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="GREEN", lwd=1)+
   geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + 
-  ylab("Concentration in Lung (ng/g) ") 
+  ylab("Concentration in Lung (ng/g) ") +
+  xlab("Time (h)")
 plot.A1_Lung
-ggsave("plots/init_fit_lung.png")
+ggsave(paste(folder,"init_fit_lung.png"))
 
 
 plot.A1_Kidney=
   ggplot() +
   geom_line(data  = Fitted_output.A1, aes(Time,CK), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CK), size=2.5) + 
-  ylab("Concentration in Kidney (ng/g)") 
+  ylab("Concentration in Kidney (ng/g)") +
+  xlab("Time (h)")
 plot.A1_Kidney
-ggsave("plots/init_fit_kidney.png")
+ggsave(paste(folder,"init_fit_kidney.png"))
 
 plot.A1_Spleen=
   ggplot() +
   geom_line(data  = Fitted_output.A1, aes(Time,CS), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + 
-  ylab("Concentration in Spleen (ng/g)") 
+  ylab("Concentration in Spleen (ng/g)") +
+  xlab("Time (h)")
 plot.A1_Spleen
-ggsave("plots/init_fit_spleen.png")
-
-
-plot.A1_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CB), size=2.5) + 
-  ylab("Concentration in Brain (ng/g)") 
-plot.A1_Brain
-ggsave("plots/init_fit_brain.png")
+ggsave(paste(folder,"init_fit_spleen.png"))
 
 #plot.A2_GI=
 #  ggplot() +
 #  geom_line(data  = Fitted_output.A2, aes(Time,CG), col="firebrick", lwd=2)
 #plot.A2_GI
-
-
 
 
 
@@ -395,7 +390,6 @@ theta.MCMC<-log(c(
 ))
 
 
-
 which_sig <- grep("sig", names(theta.MCMC)) # THE INDEX OF SIG
 
 
@@ -433,27 +427,30 @@ mcmc.fun <- function (pars, pred=FALSE){
                     CL=out$Liver_t,
                     CK = out$Kidney_t,
                     CS = out$Spleen_t,
-                    CB= out$Brain_t,
                     Clung = out$Lung_t)
   
   if (pred) return (out)
   
-  out = out[which(out$Time %in% Obs.A2$Time),]
+  out = out[which(out$Time %in% Obs.A1$Time),]
   
   ## log-transformed prediction
   log.yhat.CL     <- log(out$CL)
   log.yhat.CK     <- log(out$CK)
+  log.yhat.CS     <- log(out$CS)
+  log.yhat.Clung  <- log(out$Clung)
   
   
   ## log-transformed experimental data
   
-  log.y.CL        <- log(Obs.A2$CL)
-  log.y.CK        <- log(Obs.A2$CK)
+  log.y.CL        <- log(Obs.A1$CL)
+  log.y.CK        <- log(Obs.A1$CK)
+  log.y.CS        <- log(Obs.A1$CS)
+  log.y.Clung     <- log(Obs.A1$Clung)
   
   
   ## The method of Maximum likelihood
-  log.yhat        <- c(log.yhat.CL,log.yhat.CK)
-  log.y           <- c(log.y.CL,log.y.CK)
+  log.yhat        <- c(log.yhat.CL,log.yhat.CK,log.yhat.CS,log.yhat.Clung)
+  log.y           <- c(log.y.CL,log.y.CK,log.y.CS,log.y.Clung)
   sig2            <- as.numeric((exp(pars[which_sig][1])))
   
   log_likelihood  <- -2*sum((dnorm (log.y,
@@ -518,19 +515,17 @@ Prior <- function(pars) {
 
 
 
-
-
 #################### 5. MCMC simulation with parallel computing ############################
 detectCores()                                ## check the cores
 cl<- makeCluster(detectCores())              ## use all cores in our system     
 registerDoParallel(cl)                       ## registers a cluster of all the cores on our system
 
 # start time
-strt<-Sys.time()
+tstr<-Sys.time()
 
 # parallel
 system.time(
-  MCMC_100nm <- foreach( i = 1:4, .packages = c('mrgsolve','magrittr','FME',
+  MCMC <- foreach( i = 1:4, .packages = c('mrgsolve','magrittr','FME',
                                           'truncnorm','EnvStats',
                                           'invgamma','dplyr')) %dopar% {
                                             mod <- mcode ("micepbpk", mousePBPK.code)
@@ -548,25 +543,26 @@ system.time(
                                             
                                           }
 )
-endt<-Sys.time()
+tend<-Sys.time()
 
 #end time
-print(endt-strt)
+print(tend-tstr)
 
 stopCluster(cl)   
 
 
 ## Performance four chains to check the convergences
-MC.mouse_100nm.1 = as.mcmc (MCMC_100nm[[1]]$pars) # first  chain
-MC.mouse_100nm.2 = as.mcmc (MCMC_100nm[[2]]$pars) # second chain
-MC.mouse_100nm.3 = as.mcmc (MCMC_100nm[[3]]$pars) # third  chain
-MC.mouse_100nm.4 = as.mcmc (MCMC_100nm[[4]]$pars) # fourth chain
+MC.mouse.1 = as.mcmc (MCMC[[1]]$pars) # first  chain
+MC.mouse.2 = as.mcmc (MCMC[[2]]$pars) # second chain
+MC.mouse.3 = as.mcmc (MCMC[[3]]$pars) # third  chain
+MC.mouse.4 = as.mcmc (MCMC[[4]]$pars) # fourth chain
 
-combinedchains = mcmc.list(MC.mouse_100nm.1,MC.mouse_100nm.2,MC.mouse_100nm.3,MC.mouse_100nm.4) ## combine all chains
+## combine all chains
+combinedchains = mcmc.list(MC.mouse.1,MC.mouse.2,MC.mouse.3,MC.mouse.4) 
 gelman.diag (combinedchains)          # Gel man convergence diagnosis
 
 ## Save the posterior parameters (95% CI)
-quan.mouse = exp(summary(MC.mouse_100nm.1)$quantiles)  
+quan.mouse = exp(summary(MC.mouse.1)$quantiles)  
 
 ## Trace plot using bayes plot
 ## Convergences plot
@@ -582,9 +578,9 @@ mcmc_trace (
 
 # output the MCMC results
 write.csv(quan.mouse,file="mouse.summary_pos.csv")
-write.csv(MC.mouse_100nm.1,file="mouse.pos.csv")
-saveRDS(MCMC_100nm[[1]],file ='mouse.MCMC.rds')
-saveRDS(combinedchains,file='mouse.comb.rds')
+write.csv(MC.mouse.1,file="mouse.pos.csv")
+saveRDS(MCMC,file =paste(folder,'mouse.MCMC.rds'))
+saveRDS(combinedchains,file=paste(folder,'mouse.comb.rds'))
 
 
 ## Plot using MCMC posterior parameters
@@ -595,25 +591,24 @@ df.sim.MCMC.B = cbind.data.frame (Time=Sim.fit.MCMC.B$Time,
                                   CL=Sim.fit.MCMC.B$CL,
                                   CK=Sim.fit.MCMC.B$CK)
 
-
 plot.BL =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
+  geom_point(data = Obs.A1 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
 
 plot.BK =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
-saveRDS(theta.MCMC,file ='theta.names.rds')
+  geom_point(data = Obs.A1 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
+saveRDS(names(theta.MCMC),file ='theta.names.rds')
 
 #--------------------------------------plots-------------------------
 #--------------------1. Densities of posterior parameter uncertainty distributions of the population mean (μ). ----------
 
-Mouse.MCMC        <- readRDS(file = "results/mouse.MCMC.rds")
+Mouse.MCMC        <- readRDS(file = paste(folder,"mouse.MCMC.rds"))
 
 ## loading the theta names
-theta.names       <- readRDS(file = "theta.names.rds")
+theta.names       <- readRDS(file = paste(folder,"theta.names.rds"))
 ## Sampling from posterior parameters to generate the posterior distributions 
 ## Mouse posteiror distributions
 M.Mouse  <- exp(Mouse.MCMC$pars) %>% apply(2,mean)
