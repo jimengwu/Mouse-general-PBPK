@@ -14,20 +14,8 @@ library(doParallel)  # Package for parallel computing
 library(bayesplot)   # Package for MCMC traceplot
 library(gridExtra)
 
-folder = 'plots/31501470_nsc/'
-folder = 'plots/100nm_short_nsc/'
-folder = 'plots/4nm_short_nsc/'
-
-library(readxl)
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_13nm_short.csv")  
-
-#----------------------ZnO-----------
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/ZnO/1-ZnO.csv") 
-Obs.A1 <- Obs.A1[1:3,]
-PDOSE = Obs.A1$Dose.mg.kg.[1]
-Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
-folder = 'plots/ZnO/1_GI/'
-
+source("helper_functions.R")
+source("Mouse_PBPK.R")
 #---------------------------13 nm full dataset--------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_13nm.csv")  
 # LONG TERM (WITHIN 24h)
@@ -37,15 +25,21 @@ Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
 folder = 'plots/13nm_nsc_GI/'
 
 
+#----------------------ZnO-----------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/ZnO/1-ZnO.csv") 
+Obs.A1 <- Obs.A1[1:3,]
+PDOSE = Obs.A1$Dose.mg.kg.[1]
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/ZnO/1_GI/'
+
+
+
 #------------------Study2: 13 nm high dose-------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/31501470_Gold dextran.csv") 
 Obs.A1 <- Obs.A1[1:5,]
 PDOSE = Obs.A1$Dose.mg.kg.[1]
 Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
 folder = 'plots/31501470_nsc_GI/'
-
-
-
 #---------------------------Study2: 13nm low dose-------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/31501470_Gold dextran_2.csv")  
 Obs.A1 <- Obs.A1[1:5,]
@@ -53,14 +47,13 @@ PDOSE = Obs.A1$Dose.mg.kg.[1]
 Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
 folder = 'plots/31501470_2_nsc_GI/'
 
+
 #--------------------------Study 3: 61.2nm------------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/29677597_PEG coated Au NPs 61.2nm.csv") 
 Obs.A1 <- Obs.A1[1:8,]
 PDOSE = Obs.A1$Dose..mg.kg.[1]
 Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
 folder = 'plots/29677597_61.2_nsc_GI/'
-
-
 #--------------------------Study 3: 24.3nm------------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/29677597_PEG coated Au NPs 24.3nm.csv") 
 Obs.A1 <- Obs.A1[1:8,]
@@ -69,28 +62,13 @@ Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
 folder = 'plots/29677597_24.3_nsc_GI/'
 
 
-
-#---------------------------4 nm full dataset--------------------------
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_4nm.csv")  
-# SHORT TERM (WITHIN 24h)
-Obs.A1 <- Obs.A1[1:7,]
-PDOSE = 0.85
-Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
-folder = 'plots/4nm_nsc_GI/'
 #---------------------------100 nm short dataset--------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_100nm.csv")  
 # SHORT TERM (WITHIN 24h)
 Obs.A1 <- Obs.A1[1:3,]
 PDOSE = 0.85
 Obs.A1 <- Obs.A1[c("Time","CL","CS","Clung")] #100nm only three organs
-folder = "plots/100nm_short_nsc_GI/"
-
-#------------------TiO2: Study1: 20 nm high dose-------------------------
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/TiO2/1-TiO2.csv") 
-ObObs.A1 <- Obs.A1[1:5,]
-PDOSE = Obs.A1$Dose.mg.kg.[1]
-Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
-folder = 'plots/TiO2/1_GI/'
+folder = 'plots/100nm_short_nsc_GI/'
 
 
 
@@ -103,18 +81,87 @@ folder = 'plots/GO/2116257_GI/'
 
 
 
-#----------------------done------------
+#------------------TiO2: Study1: 20 nm high dose-------------------------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/TiO2/1-TiO2.csv") 
+Obs.A1 <- Obs.A1[1:5,]
+PDOSE = Obs.A1$Dose.mg.kg.[1]
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/TiO2/1_GI/'
+
+
+#-------------------------done-------
+
+
+
+#---------------------to be improved--------
 
 
 
 
-#--------------------------Study 3: 6.2nm------------------------------
+
+
+
+
+
+
+
+
+#---------------------------13 nm short dataset--------------------------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_13nm.csv")  
+# SHORT TERM (WITHIN 24h)
+Obs.A1 <- Obs.A1[1:3,]
+PDOSE = 0.85
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/13nm_short_nsc_2/'
+
+
+#--------------------------Study 3: 6.2nm short------------------------------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/29677597_PEG_coated_AuNPs_6.2nm.csv") 
+Obs.A1 <- Obs.A1[1:5,] # due to the data missing. the time range is limited here
+PDOSE = Obs.A1$Dose.mg.kg.[1]
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/29677597_6.2_short_nsc/'
+
+
+
+
+
+
+#---------------------------4 nm short dataset--------------------------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_4nm.csv")  
+# SHORT TERM (WITHIN 24h)
+Obs.A1 <- Obs.A1[1:3,]
+PDOSE = 0.85
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/4nm_short_nsc/'
+
+
+
+
+#--------------------------Study 3: 6.2nm time------------------------------
 Obs.A1 <- read.csv(file ="dataset/tk/mouse/29677597_PEG_coated_AuNPs_6.2nm.csv") 
 Obs.A1 <- Obs.A1[1:8,]
 PDOSE = Obs.A1$Dose.mg.kg.[1]
 Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
-folder = 'plots/29677597_6.2_nsc_GI/'
+folder = 'plots/29677597_6.2_nsc/'
 
+
+#--------------------------Study 3: 42.5nm------------------------------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/29677597_PEG coated Au NPs 42.5nm.csv") 
+Obs.A1 <- Obs.A1[1:8,]
+PDOSE = Obs.A1$Dose..mg.kg.[1]
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/29677597_42.5_nsc_GI/'
+
+
+
+#---------------------------4 nm full dataset--------------------------
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_4nm.csv")  
+# SHORT TERM (WITHIN 24h)
+Obs.A1 <- Obs.A1[1:7,]
+PDOSE = 0.85
+Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
+folder = 'plots/4nm_nsc_GI/'
 
 
 #---------------------------100 nm full dataset--------------------------
@@ -124,64 +171,100 @@ PDOSE = 0.85
 Obs.A1 <- Obs.A1[c("Time","CL","CS","Clung")] #100nm only three organs
 folder = 'plots/100nm_nsc_GI/'
 
-#--------------------------Study 3: 42.5nm------------------------------
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/29677597_PEG coated Au NPs 42.5nm.csv") 
-Obs.A1 <- Obs.A1[1:8,]
-PDOSE = Obs.A1$Dose..mg.kg.[1]
-Obs.A1 <- Obs.A1[c("Time","CL","CS","CK","Clung")]
-folder = 'plots/29677597_42.5_nsc_GI/'
-#----------------------bad------------------
 
 
 #---------------------Build mrgsolve-based PBPK Model-------
 mod <- mcode ("mouse_PBPK", mousePBPK.code)
 
 set.seed(5)
+## 2.1 initial parameters-----------
+params.init <- log(c(
+  K_release_Liver = 0.001,  # h-1
+  K_max_Liver = 20,         # h-1
+  A_cap_liver = 1000,
+  #K_50_Liver = 48,          # h
+  #n_Liver = 5,              # Unitless
+  K_release_GI = 0.001,     # h-1
+  K_max_GI = 0.075,         # h-1
+  K_GI_b = 4e-5,
+  #K_50_GI = 24,             # h
+  #n_GI = 5,                 # Unitless
+  K_release_Spleen = 0.001, # h-1
+  K_max_Spleen = 40,        # h-1
+  #A_cap_Spleen = 100,
+  #K_50_Spleen = 48,
+  #n_Spleen = 5,
+  K_release_Kidney = 0.0004, # h-1
+  K_max_Kidney = 0.075,
+  #A_cap_kidney = 100,
+  #K_50_Kidney = 24,
+  #n_Kidney = 5,
+  K_release_Lung = 0.003,   # h-1
+  K_max_Lung = 0.075,
+  #K_50_Lung = 24,
+  #n_Lung = 5,               
+  P_Liver  = 0.08,
+  P_Brain  = 0.15,
+  P_Kidney  = 0.15,
+  P_Spleen  = 0.15,
+  P_Lung  = 0.15,
+  P_Rest  = 0.15,
+  P_GI = 0.15,
+  DLC_Liver = 0.001,
+  DLC_Brain = 0.000001,
+  DLC_Kidney = 0.001,
+  DLC_Spleen = 0.03,
+  DLC_Lung = 0.001,
+  DLC_Rest = 0.000001,
+  DLC_GI = 0.001,
+  Kbile = 0.00003,       # Biliary clearance (L/hr)
+  Kurine = 0.000003,   # Urine clearance (L/hr)
+  Kfecal = 0.000003
+))
 
-#--------------------2. initial parameter sensitivity analysis------------
-## A1 data set = iv single dose of 0.85 mg/kg; Matrix: plasma; 13nm. 
-## https://linkinghub.elsevier.com/retrieve/pii/S0041-008X(10)00072-4
-## A2 data set same as above, but with 100nm
+
+tstep = min(1,min(Obs.A1$Time))
+
 
 pred.mouse <- function(pars) {
-
-    ## Get out of log domain
-    pars %<>% lapply(exp)
-
-    ## Define the exposure scenario
-
-    BW           = 0.02                              ## kg, body weight
-    tinterval    = 1                                 ## hr, Time interval
-    TDoses       = 1                                 ## Dose times, only one dose
-    #PDOSE        = 0.85                              ## mg/kg-day, Single dose
-    DOSE         = PDOSE*BW                          ## mg, amount of iv dose
-    ex.iv<- ev(ID=1, amt= DOSE,                  ## Set up the exposure events
-            ii=tinterval, addl=TDoses-1, 
-            cmt="MBV", replicate = FALSE) 
-
-    ## Set up the exposure time
-    tsamp=tgrid(0,max(Obs.A1$Time),4)     ## Simulation time 24*7 hours (180 days)
-
-    ## calculate the deposition volume
-    out <- 
+  
+  ## Get out of log domain
+  pars %<>% lapply(exp)
+  
+  ## Define the exposure scenario
+  
+  BW           = 0.02                              ## kg, body weight
+  tinterval    = 1                                 ## hr, Time interval
+  TDoses       = 1                                 ## Dose times, only one dose
+  #PDOSE        = 0.85                              ## mg/kg-day, Single dose
+  DOSE         = PDOSE*BW                          ## mg, amount of iv dose
+  ex.iv<- ev(ID=1, amt= DOSE,                  ## Set up the exposure events
+             ii=tinterval, addl=TDoses-1, 
+             cmt="MBV", replicate = FALSE) 
+  
+  ## Set up the exposure time
+  tsamp=tgrid(0,max(Obs.A1$Time),tstep)     ## Simulation time 24*7 hours (180 days)
+  
+  ## calculate the deposition volume
+  out <- 
     mod %>% 
     param(pars) %>%
     ##Req(Liver,M_tot,MBV)%>%d
     update(atol=1e-50,maxsteps = 500000000) %>%
     mrgsim_d(data = ex.iv, tgrid=tsamp)
-    
-    ## save the calculated into data frame
-    out <- data.frame(Time=out$time, 
-                      CL=out$Liver_t,
-                      CS = out$Spleen_t,
-                      CK = out$Kidney_t,
-                      Clung = out$Lung_t)
-
-    return(out)
+  
+  ## save the calculated into data frame
+  out <- data.frame(Time=out$time, 
+                    CL=out$Liver_t,                    
+                    CS = out$Spleen_t,
+                    CK = out$Kidney_t,
+                    Clung = out$Lung_t)
+  
+  return(out)
 }
 
-
-pred.mouse.oral <- function(pars) {
+#-----oral
+pred.mouse <- function(pars) {
   
   ## Get out of log domain
   pars %<>% lapply(exp)
@@ -198,7 +281,7 @@ pred.mouse.oral <- function(pars) {
              cmt="M_GI_lumen", replicate = FALSE) 
   
   ## Set up the exposure time
-  tsamp=tgrid(0,max(Obs.A1$Time),0.05)     ## Simulation time 24*7 hours (180 days)
+  tsamp=tgrid(0,max(Obs.A1$Time),tstep)     ## Simulation time 24*7 hours (180 days)
   
   ## calculate the deposition volume
   out <- 
@@ -218,373 +301,41 @@ pred.mouse.oral <- function(pars) {
   return(out)
 }
 
-## 2.1 initial parameters-----------
-params.init <- log(c(
-    K_release_Liver = 0.001,  # h-1
-    K_max_Liver = 20,         # h-1
-    A_cap_liver = 1000,
-    #K_50_Liver = 48,          # h
-    #n_Liver = 5,              # Unitless
-    K_release_GI = 0.001,     # h-1
-    K_max_GI = 0.075,         # h-1
-    K_GI_b = 4e-5,
-    #K_50_GI = 24,             # h
-    #n_GI = 5,                 # Unitless
-    K_release_Spleen = 0.001, # h-1
-    K_max_Spleen = 40,        # h-1
-    #A_cap_Spleen = 100,
-    #K_50_Spleen = 48,
-    #n_Spleen = 5,
-    K_release_Kidney = 0.0004, # h-1
-    K_max_Kidney = 0.075,
-    #A_cap_kidney = 100,
-    #K_50_Kidney = 24,
-    #n_Kidney = 5,
-    K_release_Lung = 0.003,   # h-1
-    K_max_Lung = 0.075,
-    #K_50_Lung = 24,
-    #n_Lung = 5,               
-    P_Liver  = 0.08,
-    P_Brain  = 0.15,
-    P_Kidney  = 0.15,
-    P_Spleen  = 0.15,
-    P_Lung  = 0.15,
-    P_Rest  = 0.15,
-    P_GI = 0.15,
-    DLC_Liver = 0.001,
-    DLC_Brain = 0.000001,
-    DLC_Kidney = 0.001,
-    DLC_Spleen = 0.03,
-    DLC_Lung = 0.001,
-    DLC_Rest = 0.000001,
-    DLC_GI = 0.001,
-    Kbile = 0.00003,       # Biliary clearance (L/hr)
-    Kurine = 0.000003,   # Urine clearance (L/hr)
-    Kfecal = 0.000003
-))
-
-
-#---------------------------Local sensitivity analysis------
-
-# Choose the sensitive parameters in the model
-
-## Sensitivity function (FME)
-## Check the sensitive parameters in the model ,sensvar = c("CL","CK","CS","CB","Clung")
-Sens <- sensFun(func = pred.mouse,parms = params.init)
-#Sens <- sensFun(func = pred.mouse.oral,parms = params.init)
-
-head(Sens)
-max_val <- max(Sens[3:ncol(Sens)]) # first two columns are x and var name
-max_val_scientific <- format(max_val, scientific = TRUE)
-min_val <- min(Sens[3:ncol(Sens)])
-min_val_scientific <- format(min_val, scientific = TRUE)
-
-#-------------
-# plot the sens for each parameter to different organ concentration
-
-for (i in 3:length(Sens)) {
-  
-  # Plot using ggplot
-  p1.m <- ggplot(Sens, aes(x = Sens[,1], y = Sens[, i], color = var)) +
-    geom_line(size = 1.5) + 
-    ylim(min_val,max_val)+
-    labs(x = "Time(h)", y = "normalised sensitivities of model output to parameter",title=names(params.init)[i-2]) +
-    theme_minimal()+
-    theme(
-      axis.line = element_line(linewidth = 1),  # Increase axis width
-      axis.text = element_text(size = 20),
-      axis.title = element_text(size=20),
-      plot.title = element_text(size = 20,  hjust = 0.1, vjust = -1),  # Adjust title position
-      panel.grid.major = element_blank(),
-      panel.grid.minor = element_blank(),
-      legend.text = element_text(size = 16),  # Increase legend text size
-      legend.title = element_blank()   # Increase legend title size
-    )
-  
-  # Save or print combined_plot as desired
-  ggsave(paste0("combined_init_sensitivity_plot_", names(params.init)[i-2], ".png"), 
-         path = paste0(folder,"init_sens/"), p1.m, width = 10, height = 6,dpi = 300)
-  # Clear the plot list for the next iteration
-  plot_list <- list()
-  }
-
-
-#-------------------
-
-require(reshape2)
-write.csv(params.init, file = paste0(folder,'init_sens/params_init.csv'))
-
-#-----------Absolute values of sensitivity---------
-Sens_abs <- Sens
-#sensitivity value was calculated with the time range, therefore the value is 
-# increase if the modeled time range is longer
-
-# Identify the index of the 'var' column
-var_index <- which(names(Sens) == "var")
-
-# Exclude the 'var' column and apply the absolute function to make all values positive
-Sens_abs[,-var_index] <- abs(Sens[,-var_index])
-
-df_Sens_abs=summary(Sens_abs)
-
-
-plot(df_Sens_abs)
-# Rank the data frame based on the 'Score' column
-ranked_df_Sens_abs <-df_Sens_abs[order(df_Sens_abs$Mean, decreasing = TRUE), ]
-
-graphics.off()
-png(paste0(paste0(folder,"init_sens/"),"ranked_df_Sens_abs_plot.png"),width=3500,height=2800,res = 300)
-plot(df_Sens_abs[order(df_Sens_abs$Mean, decreasing = FALSE), ])
-dev.off()
-
-
-#---------------------------median---------------------
-# Custom function to calculate summary statistics with median
-summary_with_median <- function(x) {
-  # Exclude non-numeric values
-  x_numeric <- as.numeric(x)
-  x_numeric <- x_numeric[!is.na(x_numeric)]
-  
-  if (length(x_numeric) == 0) {
-    # If no numeric values are present, return NA for all summary statistics
-    result <- c(Median = NA, Q1 = NA, Q3 = NA, NAs = sum(is.na(x)))
-  } else {
-    # Calculate summary statistics
-    med <- median(x_numeric)
-    q25 <- quantile(x_numeric, 0.25)
-    q75 <- quantile(x_numeric, 0.75)
-    n_missing <- sum(is.na(x))
-    
-    result <- c(Median = med, Q1 = q25, Q3 = q75, NAs = n_missing)
-  }
-  
-  names(result) <- c("Median", "1st Qu.", "3rd Qu.", "NA's")
-  
-  return(result)
-}
-
-# Apply the custom function to your dataset
-summary_stats_median <- apply(Sens_abs, 2, summary_with_median)
-
-# Transpose the summary statistics
-summary_stats_median_transposed <- t(summary_stats_median)
-
-# Calculate the number of rows in the transposed summary statistics matrix
-num_rows <- nrow(summary_stats_median_transposed)
-
-# Print rows from the second row onwards
-print(summary_stats_median_transposed[3:num_rows, ])
-
-# Calculate the number of rows in the transposed summary statistics matrix
-num_rows <- nrow(summary_stats_median_transposed)
-
-# Extract rows from the third row onwards and exclude the first two rows which contain column names and NA's
-data_subset <- summary_stats_median_transposed[3:num_rows, ]
-
-# Order the dataframe based on the Median column in descending order
-ranked_df_median <- data_subset[order(data_subset[, "Median"], decreasing = TRUE), ]
-
-# Print the ranked dataframe
-print(ranked_df_median)
-# Extract the median values from the ranked dataframe
-medians <- as.numeric(ranked_df_median[,"Median"])
-
-# Plot histogram of median values
-hist(medians, main = "Histogram of Median Values", xlab = "Median", ylab = "Frequency")
-#-------------------------------median----------------------
-
-#------todo : the correlation sensitivity plot between these parameters-------
-#png(paste(folder,"pars_corr.png"),width=2500,height=1800,res=300)
-#pairs(Sens)
-#dev.off()
-#--------------
-# ALMOST EVERY PARAMETERS ARE CORRELATED WITH EACH OTHER
-
-select_par = rownames(ranked_df_Sens_abs[1:8,])
-
-select_par = rownames(ranked_df_Sens_abs[ranked_df_Sens_abs$Mean>0.5,])
-select_par
-
-# Get row names corresponding to the selected rows
-select_par <- rownames(ranked_df_median)[1:6]
-
-# Print selected parameters
-print(select_par)
-
-
-## --------2.2 selected sensitive parameters-----------------------
-### set up sensitive or necessary parameters as model input
-
-params2fit = params.init[select_par]
-
-## Cost function (FME)
-## Estimate the model residual by modCost function
-MCcost<-function (pars, obs){
-  out<- pred.mouse(pars)
-  cost<- modCost(model=out,obs=obs,weight='mean',x="Time")
-  return(cost)
-}
-
-#------------------3. Fitting with A1 dataset using modFit function-----------------------------
-#Obs.A1 <- Obs.A1[c("Time","CL","CK","CS")]
-Fit.Result.A1<- modFit(f=MCcost, p=params2fit, obs=Obs.A1, method ="Nelder-Mead", 
-                       control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-#Fit.Result.A1<- modFit(f=MCcost.oral, p=params2fit, obs=Obs.A1, method ="Nelder-Mead", 
-#                       control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A1)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-
-
-
-res.A1=MCcost(Fit.Result.A1$par, obs=Obs.A1)$residuals$res     ## Check the residual for each time points
-sum(res.A1^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A1 = pred.mouse(par=Fit.Result.A1$par)
-#Fitted_output.A1 = pred.mouse.oral(par=Fit.Result.A1$par)
-
-plot.A1=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CL), col="firebrick", lwd=1.5)+
-  geom_point(data = Obs.A1    , aes(Time, CL), size=2) + 
-  ylab("Concentration in Liver (ng/g)") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-        )
-
-
-#plot.A1
-
-#ggsave(paste0(folder,"mod_fit/mod_fit_liver.png"),width=10,height=8)
-
-
-plot.A1_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="firebrick", lwd=1.5)+
-  geom_point(data = Obs.A1    , aes(Time, Clung), size=2) + 
-  ylab("Concentration in Lung (ng/g) ") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-#plot.A1_Lung
-#ggsave(paste0(folder,"mod_fit/mod_fit_lung.png"),width=10,height=8)
-
-
-plot.A1_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CK), col="firebrick", lwd=1.5)+
-  geom_point(data = Obs.A1    , aes(Time, CK), size=2) + 
-  ylab("Concentration in Kidney (ng/g)") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-#plot.A1_Kidney
-
-#ggsave(paste0(folder,"mod_fit/mod_fit_kidney.png"),width=10,height=8)
-
-#col="#bcd1bc",
-plot.A1_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CS), color="firebrick", lwd=1.5)+
-  geom_point(data = Obs.A1    , aes(Time, CS), size=2,col="black") + 
-  ylab("Concentration in Spleen (ng/g)") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-#plot.A1_Spleen
-#ggsave(paste0(folder,"mod_fit/mod_fit_spleen.png"),width=10,height=8)
-
-
-library(gridExtra)
-
-# Arrange the four plots together
-combined_mod_fit_plot <- grid.arrange(plot.A1,plot.A1_Lung,plot.A1_Spleen, 
-                                      ncol = 2, nrow = 2)
-
-
-# Arrange the four plots together
-combined_mod_fit_plot <- grid.arrange(plot.A1,plot.A1_Kidney,plot.A1_Lung,plot.A1_Spleen, 
-                              ncol = 2, nrow = 2)
-
-
-
-
-# Save the combined plot
-ggsave(paste0(folder, "mod_fit/mod_fit_combined.png"), combined_mod_fit_plot, width = 14, height = 10)
-
-
-# Original list
-params.mod <- params.init
-
-# New list with replacements
-Fit.Result.A1$par
-
-# Iterate over the names of the new list
-for (name in names(Fit.Result.A1$par)) {
-  # Replace the element in the original list with the corresponding element from the new list
-  params.mod[[name]] <- Fit.Result.A1$par[[name]]
-}
-
-#saveRDS(params.mod,file =paste0(folder,'mod_fit/params_fitted.rds'))
-write.csv(params.mod, file = paste0(folder,'mod_fit/params_fitted.csv'))
-
-params_summary <- as.data.frame(cbind(Initial = unlist(params.init), mod_fitted = unlist(params.mod)))
-write.csv(params_summary, file = paste0(folder,'mod_fit/params_summary.csv'))
 
 ########################################## 4. Model Evalution with MCMC  ###########################################
 #################################################################################################################
 
+paras = read.csv(paste0(folder,'mod_fit/params_fitted_v2.csv'))
+params.mod = as.list(paras)$x
+names(params.mod)<- names(params.init)
 
+Fitted_output.A1 = pred.mouse(par=params.mod)
 #------Input parameters set----------
-
 
 # Define parameter names
 sig_names <- c(
   "sig2",
   "sig_K_release_Liver", "sig_K_max_Liver", 
   "sig_A_cap_Liver", 
+  "sig_K_release_GI", "sig_K_max_GI", "sig_K_GI_b", 
   "sig_K_release_Spleen", "sig_K_max_Spleen", 
-  #"sig_A_cap_Spleen", 
   "sig_K_release_Kidney", "sig_K_max_Kidney", 
-  #"sig_A_cap_Kidney",
   "sig_K_release_Lung", "sig_K_max_Lung", 
   "sig_P_Liver", "sig_P_Brain", "sig_P_Kidney", 
-  "sig_P_Spleen", "sig_P_Lung", "sig_P_Rest",
+  "sig_P_Spleen", "sig_P_Lung", "sig_P_Rest","sig_P_GI",
   "sig_DLC_Liver", "sig_DLC_Brain", "sig_DLC_Kidney", 
-  "sig_DLC_Spleen", "sig_DLC_Lung", "sig_DLC_Rest",
-  "sig_Kbile", "sig_Kurine"
+  "sig_DLC_Spleen", "sig_DLC_Lung", "sig_DLC_Rest","sig_DLC_GI",
+  "sig_Kbile", "sig_Kurine","sig_Kfecal"
 )
 
-sig_population = 0.3
+sig_population = 0.5
 
 # Create a named vector with default values
 sig_values <- rep(sig_population, length(sig_names))
 names(sig_values) <- sig_names
 
 # Update specific values
-sig_pred = 0.5
+sig_pred = 0.3
 sig_values["sig2"] <- sig_pred
 
 # Create sig_list
@@ -649,22 +400,22 @@ combined_density_df <- do.call(rbind, density_data)
 
 # Calculate mean and standard deviation for each parameter
 pri_mean_sd_df <- data.frame(Par = names(mean.prior),
-                         Mean = unlist(mean.prior),
-                         SD = unlist(sd.prior))
+                             Mean = unlist(mean.prior),
+                             SD = unlist(sd.prior))
 
 
 # Plot density curves with facets for each parameter
 pri_den_plot<- ggplot(combined_density_df, aes(x = x, y = density, fill = "Density")) +
   geom_area(color="black",size=1) +
   #geom_area(fill = "gray70") +  # Fill the area under the curve with gray color
-  facet_wrap(~ Par, scales = "free", nrow = 5, ncol = 5) +
+  facet_wrap(~ Par, scales = "free", ncol = 6) +
   labs(title = "Density Distribution by Parameter") +
   theme_minimal()+
   theme(panel.grid = element_blank(),  # Remove grid lines
         panel.background = element_rect(fill = "transparent"),
         axis.text.x = element_text(angle = 30, hjust = 1)) +  # Set background to transparent
   geom_text(data = pri_mean_sd_df, aes(label = paste0("Mean:", sprintf("%.1e", Mean), 
-                                                  "\nSD:", sprintf("%.1e", SD))), 
+                                                      "\nSD:", sprintf("%.1e", SD))), 
             x = Inf, y = -Inf, hjust = 1, vjust = -1, size = 3.5,color="black") +  # Add mean and sd as text annotations
   scale_fill_manual(values = "gray")
 
@@ -677,17 +428,20 @@ ggsave(paste0(folder,"mc_sens/pri_density_distribution_plot.png"), pri_den_plot,
 write.csv(pri_mean_sd_df, file = paste0(folder,"mc_sens/pri_paras_stats.csv"), row.names = FALSE)
 ##---------------------------prior distribution plotting--------------
 
-saveRDS(theta.MCMC,file =paste0(folder,'MCMC/theta.rds'))
 
 #--------------Maximum likelihood estimation (MLE) function for MCMC----
 mcmc.fun <- function (pars){
   
   out <- pred.mouse(pars[-which_sig])
   out = out[which(out$Time %in% Obs.A1$Time),]
+  # making sure the predicted value and observed value matching with each other as
+  # the time step in predicting function might not be small enough to cover the time step in the 
+  # observed time step
+  Obs.A1 = Obs.A1[which(Obs.A1$Time %in% out$Time),] 
   
   ## log-transformed prediction
   log.yhat.CL     <- log(out$CL)
-  log.yhat.CK     <- log(out$CK)
+  #log.yhat.CK     <- log(out$CK)
   log.yhat.CS     <- log(out$CS)
   log.yhat.Clung  <- log(out$Clung)
   
@@ -695,22 +449,27 @@ mcmc.fun <- function (pars){
   ## log-transformed experimental data
   
   log.y.CL        <- log(Obs.A1$CL)
-  log.y.CK        <- log(Obs.A1$CK)
+  #log.y.CK        <- log(Obs.A1$CK)
   log.y.CS        <- log(Obs.A1$CS)
   log.y.Clung     <- log(Obs.A1$Clung)
-
+  
   
   ## The method of Maximum likelihood
-  log.yhat        <- c(log.yhat.CL,log.yhat.CK,log.yhat.CS,log.yhat.Clung)
-  log.y           <- c(log.y.CL,log.y.CK,log.y.CS,log.y.Clung)
+  #log.yhat        <- c(log.yhat.CL,log.yhat.CK,log.yhat.CS,log.yhat.Clung)
+  #log.y           <- c(log.y.CL,log.y.CK,log.y.CS,log.y.Clung)
+  
+  log.yhat        <- c(log.yhat.CL,log.yhat.CS,log.yhat.Clung)
+  log.y           <- c(log.y.CL,log.y.CS,log.y.Clung)
+  
+
+  
+  #todo：100nm
+  #log.yhat        <- c(log.yhat.CL)
+  #log.y           <- c(log.y.CL)
   
   non_nan_indices <- which(!is.na(log.y))
   log.yhat        <- log.yhat[non_nan_indices]
   log.y           <- log.y[non_nan_indices]
-  
-  #todo：100nm
-  #log.yhat        <- c(log.yhat.CL,log.yhat.CS,log.yhat.Clung)
-  #log.y           <- c(log.y.CL,log.y.CS,log.y.Clung)
   
   sig2            <- as.numeric((exp(pars[which_sig][1])))
   
@@ -732,7 +491,7 @@ Prior <- function(pars) {
   # The likelihood for population mean (parameters)
   # Calculate likelihoods of each parameters; P(u|mean,CV)
   pars.data = exp(pars[-which_sig]) # parameter value
- 
+  
   mean           = exp(theta.MCMC[-which_sig]) # parameter mean in the distribution
   CV             = 0.3     # Coefficient of variation; Default value of 0.5 in all parameters (Bois,2000; Bois et al., 1996)
   
@@ -742,7 +501,7 @@ Prior <- function(pars) {
                               mean = mean, sd = mean*CV ) 
   
   # The likelihood for population variance; P(sigmal^2|sigmal0^2)
-
+  
   CV.sig         = exp(theta.MCMC[which_sig])[2:length(theta.MCMC[which_sig])]               # Sigmal0
   
   CU             = 1                                              # Coefficient of uncertainty (CU) (Hack et al., 2006)
@@ -753,7 +512,7 @@ Prior <- function(pars) {
   
   sig  <- as.numeric (exp(pars[which_sig][2:length(pars.data [which_sig])]))   # Coefficient of variation from population variance; sigmal0
   prior_sig      = dinvgamma (sig, shape = alpha , scale = beta)  # prior distribution for population variance; sigma2
-
+  
   
   ## individual level; P(theta|u,sigmal^2)
   mean_i         = prior_pars
@@ -794,16 +553,15 @@ tstr<-Sys.time()
 #niter = 120000
 #burninlength  = 60000
 #outputlength  = 60000
-
-
-
-niter = 200000
-burninlength  = 100000
-outputlength  = 100000
-
 niter = 200
 burninlength  = 100
 outputlength  = 100
+
+
+niter = 300000
+burninlength  = 150000
+outputlength  = 150000
+
 
 # parallel
 system.time(
@@ -822,7 +580,7 @@ system.time(
                                                     burninlength  = burninlength,    ## number of initial iterations to be removed from output.
                                                     outputlength  = outputlength,     ## number of output iterations  
                                                     verbose=1
-                                                    )                    
+                                            )                    
                                             
                                           }
 )
@@ -863,26 +621,6 @@ if (!file.exists(paste0(folder,"MCMC/"))) {
 write.csv(MC.mouse.1,file=paste0(folder,"MCMC/mouse.chain1.csv"))
 saveRDS(MCMC,file =paste0(folder,'MCMC/mouse.MCMC.rds'))
 saveRDS(combinedchains,file=paste0(folder,'MCMC/mouse.MCMC.comb.rds'))
-
-
-## Plot using MCMC posterior parameters
-## Model validation using one of the best posterior parameter combination
-Sim.fit.MCMC.B = pred.mouse (par = MCMC[[1]]$bestpar)
-
-df.sim.MCMC.B = cbind.data.frame (Time=Sim.fit.MCMC.B$Time, 
-                                  CL=Sim.fit.MCMC.B$CL,
-                                  CK=Sim.fit.MCMC.B$CK)
-
-plot.BL =
-  ggplot() +
-  geom_line(data = df.sim.MCMC.B,aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
-plot.BL
-plot.BK =
-  ggplot() +
-  geom_line(data = df.sim.MCMC.B,aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
-plot.BK
 
 #--------------------------------------plots-------------------------
 #--------------------1. Densities of posterior parameter uncertainty distributions of the population mean (μ). ----------
@@ -931,8 +669,8 @@ for (param_index in seq_along(M.Mouse)) {
   
   # Create a dataframe for the density estimation data
   post_density_df <- data.frame(x = post_density_estimation$x, 
-                           density = post_density_estimation$y, 
-                           Par = names(M.Mouse)[param_index])
+                                density = post_density_estimation$y, 
+                                Par = names(M.Mouse)[param_index])
   
   # Store the density dataframe
   post_density_data[[param_index]] <-post_density_df
@@ -943,8 +681,8 @@ combined_post_density_df <- do.call(rbind, post_density_data)
 
 # Calculate mean and standard deviation for each parameter
 post_mean_sd_df <- data.frame(Par = names(M.Mouse),
-                             Mean = unlist(M.Mouse),
-                             SD = unlist(SD.Mouse))
+                              Mean = unlist(M.Mouse),
+                              SD = unlist(SD.Mouse))
 
 
 # Plot density curves with facets for each parameter the nrow and ncol might need to be changed
@@ -966,7 +704,7 @@ post_den_plot <- ggplot(combined_post_density_df %>%
             aes(label = paste0("Mean:", sprintf("%.2e", Mean), "\nSD:", sprintf("%.2e", SD))), 
             x = Inf, y = Inf, hjust = 1, vjust = 1.5, size = 3.5, color = "black")  # Add mean and sd as text annotations
 
-print(post_den_plot)
+#print(post_den_plot)
 
 
 prior_post_den_plot <- ggplot() +
@@ -988,7 +726,7 @@ prior_post_den_plot <- ggplot() +
   scale_fill_manual(name = "Distribution", values = c("Prior" = "#9EC7C5", "Posterior" = "#D17E5E")) + # Add legend for distribution
   guides(fill = guide_legend(title = "Distribution")) # Add legend title
 
-print(prior_post_den_plot)
+#print(prior_post_den_plot)
 
 
 
@@ -1013,14 +751,14 @@ Newtime.r   = pred.mouse(theta.MCMC)$Time
 nrwo.r = length (Newtime.r)
 
 
-MC.mouse.a.CL    = matrix(nrow = nrwo.r, ncol = outputlength/10)
-MC.mouse.a.CK    = matrix(nrow = nrwo.r, ncol = outputlength/10)
-MC.mouse.a.Clung = matrix(nrow = nrwo.r, ncol = outputlength/10)
-MC.mouse.a.CS    = matrix(nrow = nrwo.r, ncol = outputlength/10)
+MC.mouse.a.CL    = matrix(nrow = nrwo.r, ncol = outputlength/100)
+MC.mouse.a.CK    = matrix(nrow = nrwo.r, ncol = outputlength/100)
+MC.mouse.a.Clung = matrix(nrow = nrwo.r, ncol = outputlength/100)
+MC.mouse.a.CS    = matrix(nrow = nrwo.r, ncol = outputlength/100)
 
-for(i in 1:(outputlength/10)){
+for(i in 1:(outputlength/100)){
   
-  j = i *10  # sample parameter set once every ten sets, 
+  j = i *100  # sample parameter set once every ten sets, 
   #so you will have 5000 sets from 50000 total sets
   
   pars.mouse             = Mouse.MCMC$pars    [j,]     
@@ -1095,6 +833,7 @@ MC.mouse.CS.plot <- cbind(
 )
 
 
+
 p.r.L <- 
   ggplot() + 
   geom_ribbon(data = MC.mouse.CL.plot, aes(x = Time, ymin = ci_lower_est, ymax = ci_upper_est, color = "95% CI"), 
@@ -1150,7 +889,7 @@ p.r.K <-
         axis.line = element_line(color = "black")         # Show x and y axes
   )
 
-p.r.K
+#p.r.K
 #ggsave(paste0(folder,"MCMC/MCMC_fit_Kidney.png"),width = 10, height = 8)
 
 
@@ -1180,7 +919,7 @@ p.r.lung <-
         axis.line = element_line(color = "black")         # Show x and y axes
   )
 
-p.r.lung
+#p.r.lung
 #ggsave(paste0(folder,"MCMC/MCMC_fit_lung.png"),width = 10, height = 8)
 
 
@@ -1209,21 +948,21 @@ p.r.S <-
         axis.line = element_line(color = "black")) +
   guides(color = guide_legend(title = "Legend"))  # Add legend title
 
-p.r.S
+#p.r.S
 
 #ggsave(paste0(folder,"MCMC/MCMC_fit_spleen.png"),width = 10, height = 8)
 
 
 library(gridExtra)
 # Arrange the four plots together
-combined_plot <- grid.arrange(p.r.L, p.r.S, p.r.lung, 
+combined_MCMC_plot <- grid.arrange(p.r.L,  p.r.lung, p.r.S,
                               ncol = 2, nrow = 2)
 # Arrange the four plots together
-combined_plot <- grid.arrange(p.r.L, p.r.K, p.r.S, p.r.lung, 
+combined_MCMC_plot <- grid.arrange(p.r.L, p.r.K, p.r.lung, p.r.S,
                               ncol = 2, nrow = 2)
 
 # Save the combined plot
-ggsave(paste0(folder, "MCMC/mcmc_fit_combined.png"), combined_plot, width = 14, height = 10)
+ggsave(paste0(folder, "MCMC/mcmc_fit_combined.png"), combined_MCMC_plot, width = 14, height = 10)
 
 
 
@@ -1260,102 +999,4 @@ mcmc_dens_overlay(
 ggsave(paste0(folder,"mc_sens/prob_chains.png"))
 
 write.csv(R[1],paste0(folder,"mc_sens/r.csv"))
-
-
-#--------------------------------verify using other 13 nm datasets--------
-
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/31501470_Gold dextran.csv") 
-# SHORT TERM (WITHIN 24h)
-Obs.A1 <- Obs.A1[1:4,]
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/31501470_Gold dextran_2.csv")  
-# SHORT TERM (WITHIN 24h)
-Obs.A1 <- Obs.A1[1:4,]
-PDOSE = Obs.A1$Dose.mg.kg.[1]
-
-Obs.A1 <- Obs.A1[c("Time","CL","CS","Clung","CK")]
-
-params=readRDS(file = paste0("plots/13nm_short_nsc/","MCMC/theta.rds"))[1:22]
-Fitted_output.A1 = pred.mouse(par=params2)
-
-
-
-
-
-res.A1=MCcost(Fit.Result.A1$par, obs=Obs.A1)$residuals$res      ## Check the residual for each time points
-sum(res.A1^2)                                    ## Total residuals 
-
-
-plot.A1=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + 
-  ylab("Concentration in Liver (ng/g)") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-plot.A1
-#ggsave(paste0(folder,"mod_fit/mod_fit_liver.png"),width=10,height=8)
-
-
-plot.A1_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + 
-  ylab("Concentration in Lung (ng/g) ") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-plot.A1_Lung
-#ggsave(paste0(folder,"mod_fit/mod_fit_lung.png"),width=10,height=8)
-
-
-plot.A1_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CK), size=2.5) + 
-  ylab("Concentration in Kidney (ng/g)") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-plot.A1_Kidney
-#ggsave(paste0(folder,"mod_fit/mod_fit_kidney.png"),width=10,height=8)
-
-
-plot.A1_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + 
-  ylab("Concentration in Spleen (ng/g)") +
-  xlab("Time (h)")+
-  theme_minimal()+
-  theme(axis.title = element_text(size = 22),  # Adjust the size of x-axis label
-        axis.text = element_text(size = 20),
-        panel.grid.major = element_blank(),    # Remove major grid lines
-        panel.grid.minor = element_blank(),     # Remove minor grid lines
-        axis.line = element_line()             # Show x and y axes
-  )
-plot.A1_Spleen
-#ggsave(paste0(folder,"mod_fit/mod_fit_spleen.png"),width=10,height=8)
-
-
-library(gridExtra)
-
-# Arrange the four plots together
-combined_plot <- grid.arrange(plot.A1,plot.A1_Kidney, plot.A1_Lung,plot.A1_Spleen, 
-                              ncol = 2, nrow = 2)
 

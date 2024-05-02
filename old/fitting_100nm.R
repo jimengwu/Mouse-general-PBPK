@@ -12,8 +12,8 @@ library(invgamma)    # Package for inverse gamma distribution function
 library(foreach)     # Package for parallel computing
 library(doParallel)  # Package for parallel computing
 library(bayesplot)   # Package for MCMC traceplot
-folder = 'plots/100nm/'
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_100nm.csv")  
+folder = 'plots/100nm_short_nsc/'
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_100nm_short.csv")  
 set.seed(12)
 #--------------------1. model mass balance checking---------------
 
@@ -32,7 +32,7 @@ ex.iv<- ev(ID=1, amt= DOSE,                      ## Set up the exposure events
            cmt="MBV", replicate = FALSE) 
 
 ## Set up the exposure time
-tsamp=tgrid(0,tinterval*(TDoses-1)+24*180,tinterval)     ## Simulation time 24*180 hours (180 days)
+tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,tinterval)     ## Simulation time 24*7 hours (180 days)
 
 ## calculate the deposition volume
 out <- 
@@ -66,7 +66,7 @@ nm_size = "100nm"
 plot (y=out$CL, x=out$Time,xlab = "Time", main = paste("Liver concentration",nm_size),
       type='l',log="x")
 plot (y=out$CLt, x=out$Time,xlab = "Time", main = paste("Liver Tissue concentration",nm_size),
-      type='l',log="x",ylim=c(0,10000))
+      type='l',ylim=c(0,10000))
 plot (y=out$CSt, x=out$Time,xlab = "Time", main = paste("Spleen Tissue concentration",nm_size),
       type='l',ylim=c(0,10000))
 plot (y=out$CKt, x=out$Time,xlab = "Time", main = paste("Kidney Tissue concentration",nm_size),
@@ -80,9 +80,11 @@ plot.l=
   geom_line(data  = out, aes(Time,CLt), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + 
   ylab("Concentration in Liver (ng/g)") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.l
-ggsave(paste(folder,"mb_liver.png"))
+ggsave(paste(folder,"mb_liver.png"),width=10,height=8)
 
 
 plot.s=
@@ -90,18 +92,22 @@ plot.s=
   geom_line(data  = out, aes(Time,CSt), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + 
   ylab("Concentration in Spleen (ng/g)") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.s
-ggsave(paste(folder,"mb_spleen.png"))
+ggsave(paste(folder,"mb_spleen.png"),width=10,height=8)
 
 plot.k=
   ggplot() +
   geom_line(data  = out, aes(Time,CKt), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CK), size=2.5) + 
   ylab("Concentration in Kidney (ng/g)") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.k
-ggsave(paste(folder,"mb_kidney.png"))
+ggsave(paste(folder,"mb_kidney.png"),width=10,height=8)
 
 
 plot.lu=
@@ -109,9 +115,11 @@ plot.lu=
   geom_line(data  = out, aes(Time,CLungt), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + 
   ylab("Concentration in Lung (ng/g)") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.lu
-ggsave(paste(folder,"mb_lung.png"))
+ggsave(paste(folder,"mb_lung.png"),width=10,height=8)
 
 
 #--------------------2. initial parameter sensitivity analysis------------
@@ -136,7 +144,7 @@ pred.mouse <- function(pars) {
             cmt="MBV", replicate = FALSE) 
 
     ## Set up the exposure time
-    tsamp=tgrid(0,tinterval*(TDoses-1)+24*180,tinterval)     ## Simulation time 24*180 hours (180 days)
+    tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,tinterval)     ## Simulation time 24*7 hours (180 days)
 
     ## calculate the deposition volume
     out <- 
@@ -279,9 +287,11 @@ plot.A1=
   geom_line(data  = Fitted_output.A1, aes(Time,CL), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + 
   ylab("Concentration in Liver (ng/g)") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.A1
-ggsave(paste(folder,"init_fit_liver.png"))
+ggsave(paste(folder,"init_fit_liver.png"),width=10,height=8)
 
 
 plot.A1_Lung=
@@ -289,9 +299,11 @@ plot.A1_Lung=
   geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + 
   ylab("Concentration in Lung (ng/g) ") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.A1_Lung
-ggsave(paste(folder,"init_fit_lung.png"))
+ggsave(paste(folder,"init_fit_lung.png"),width=10,height=8)
 
 
 #plot.A1_Kidney=
@@ -308,9 +320,11 @@ plot.A1_Spleen=
   geom_line(data  = Fitted_output.A1, aes(Time,CS), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + 
   ylab("Concentration in Spleen (ng/g)") +
-  xlab("Time (h)")
+  xlab("Time (h)")+
+  theme(axis.title = element_text(size = 26),  # Adjust the size of x-axis label
+        axis.text = element_text(size = 22))
 plot.A1_Spleen
-ggsave(paste(folder,"init_fit_spleen.png"))
+ggsave(paste(folder,"init_fit_spleen.png"),width=10,height=8)
 
 #plot.A2_GI=
 #  ggplot() +
@@ -426,7 +440,7 @@ mcmc.fun <- function (pars, pred=FALSE){
              cmt="MBV", replicate = FALSE) 
   
   ## set up the exposure time
-  tsamp=tgrid(0,tinterval*(TDoses-1)+24*180,tinterval)     ## Simulation time 24*180 hours (180 days)
+  tsamp=tgrid(0,tinterval*(TDoses-1)+24*7,tinterval)     ## Simulation time 24*7 hours (180 days)
   
   
   ## Get a prediction
@@ -483,7 +497,7 @@ Prior <- function(pars) {
   ## Population level
   # The likelihood for population mean (parameters)
   pars.data = exp(pars[-which_sig])
-  sig  <- as.numeric (exp(pars[which_sig][2:31]))                 # Coefficient of variation from population variance; sigmal0
+  sig  <- as.numeric (exp(pars[which_sig][2:length(pars.data [which_sig])]))                 # Coefficient of variation from population variance; sigmal0
   sig2 <- as.numeric (exp(pars[which_sig][1]))                    # error variances from model residual
   
   mean           = exp(theta.MCMC[-which_sig])
@@ -498,7 +512,7 @@ Prior <- function(pars) {
   
   # The likelihood for population variance; P(sigmal^2|sigmal0^2)
   CU             = 1                                              # Coefficient of uncertainty (CU) (Hack et al., 2006)
-  CV.sig         = exp(theta.MCMC[which_sig])[2:31]               # Sigmal0
+  CV.sig         = exp(theta.MCMC[which_sig])[2:length(pars.data [which_sig])]               # Sigmal0
   alpha          = (2+1)/(CU^2)                                   # Shape parameter  of gamma distribution; Appendix Table A-7 from EPA (2011) :EPA/635/R-09/011F
   beta           = (alpha-1)*CV.sig^2                             # Scale parameter  of gamma distribution; Appendix Table A-7 from EPA (2011) :EPA/635/R-09/011F
   
@@ -535,6 +549,9 @@ registerDoParallel(cl)                       ## registers a cluster of all the c
 
 # start time
 tstr<-Sys.time()
+niter = 500000
+burninlength  = 250000
+outputlength  = 50000
 
 # parallel
 system.time(
@@ -544,15 +561,15 @@ system.time(
                                             mod_100nm <- mcode ("mouse_PBPK", mousePBPK_100nm.code)
                                             modMCMC(f             = mcmc.fun, 
                                                     p             = theta.MCMC, 
-                                                    niter         = 500000,           ## iteration number 
+                                                    niter         = niter,           ## iteration number 
                                                     jump          = 0.01,             ## jump function generation new parameters distribution using covrate matrix
                                                     prior         = Prior,            ## prior function
                                                     updatecov     = 50,               ## adaptive Metropolis
                                                     var0          = NULL,             ## initial model variance;
                                                     wvar0         = 0.01,             ## "weight" for the initial model variance
                                                     ntrydr        = 2,                ## delayed Rejection
-                                                    burninlength  = 250000,           ## number of initial iterations to be removed from output.
-                                                    outputlength  = 50000,
+                                                    burninlength  = burninlength,           ## number of initial iterations to be removed from output.
+                                                    outputlength  = outputlength,
                                                     verbose=5)            ## number of output iterations           
                                             
                                           }
@@ -592,19 +609,14 @@ saveRDS(combinedchains,file=paste(folder,'mouse.comb.rds'))
 Sim.fit.MCMC.B = mcmc.fun (par = MCMC[[1]]$bestpar,pred=TRUE)
 
 df.sim.MCMC.B = cbind.data.frame (Time=Sim.fit.MCMC.B$Time, 
-                                  CL=Sim.fit.MCMC.B$CL,
-                                  CK=Sim.fit.MCMC.B$CK)
+                                  CL=Sim.fit.MCMC.B$CL)
 
 plot.BL =
   ggplot() +
   geom_line(data = df.sim.MCMC.B,aes(Time,CL), col="firebrick", lwd=2)+
   geom_point(data = Obs.A1 ,aes(Time, CL),size=2.5) + ylab("Concentration") 
 plot.BL
-plot.BK =
-  ggplot() +
-  geom_line(data = df.sim.MCMC.B,aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1 ,aes(Time, CK),size=2.5) + ylab("Concentration") 
-plot.BK
+
 
 #--------------------------------------plots-------------------------
 #--------------------1. Densities of posterior parameter uncertainty distributions of the population mean (μ). ----------
@@ -618,11 +630,11 @@ theta.names       <- names(readRDS(file = paste(folder,"theta.rds")))
 ## Mouse posteiror distributions
 M.Mouse  <- exp(Mouse.MCMC$pars) %>% apply(2,mean)
 SD.Mouse <- exp(Mouse.MCMC$pars) %>% apply(2,sd)
-dis.Mouse <- matrix(ncol = 50000, nrow = 30)
-rownames(dis.Mouse) <- names(M.Mouse)[1:30]
+dis.Mouse <- matrix(ncol = outputlength, nrow = length(Mouse.MCMC$bestpar[-which_sig]))
+rownames(dis.Mouse) <- names(M.Mouse)[1:length(Mouse.MCMC$bestpar[-which_sig])]
 
-for (i in 1:50000){
-  for (j in 1:30){
+for (i in 1: outputlength){
+  for (j in 1:length(Mouse.MCMC$bestpar[-which_sig])){
     dis.Mouse[j,i] <- rnorm (1, mean = M.Mouse[j], sd= SD.Mouse[j])
   }
 }
@@ -696,22 +708,22 @@ Newtime.r   = pred.mouse(theta.MCMC)$Time
 # this is the new time variable, now it has been changed to sample per day.
 nrwo.r = length (Newtime.r)
 
-MC.mouse.a.CL    = matrix(nrow = nrwo.r, ncol = 5000)
-MC.mouse.a.CK    = matrix(nrow = nrwo.r, ncol = 5000)
-MC.mouse.a.Clung    = matrix(nrow = nrwo.r, ncol = 5000)
-MC.mouse.a.CS    = matrix(nrow = nrwo.r, ncol = 5000)
+MC.mouse.a.CL    = matrix(nrow = nrwo.r, ncol = outputlength/10)
+MC.mouse.a.CK    = matrix(nrow = nrwo.r, ncol = outputlength/10)
+MC.mouse.a.Clung    = matrix(nrow = nrwo.r, ncol = outputlength/10)
+MC.mouse.a.CS    = matrix(nrow = nrwo.r, ncol = outputlength/10)
 
-for(i in 1:5000){
+for(i in 1:(outputlength/10)){
   
   j = i *10  
-  pars.mouse             = MCMC[[1]]$pars    [j,]     # sample parameter set once every ten sets, so you will have 5000 sets from 50000 total sets
+  pars.mouse             = Mouse.MCMC[[1]]$pars    [j,]     # sample parameter set once every ten sets, so you will have 5000 sets from 50000 total sets
   
   MCdata               = pred.mouse (pars.mouse)
   MC.mouse.a.CL[,i]= MCdata$CL
   MC.mouse.a.CK[,i]= MCdata$CK
   MC.mouse.a.Clung[,i]= MCdata$Clung
   MC.mouse.a.CS[,i]= MCdata$CS
-  #cat("iteration = ", i , "\n") # Shows the progress of iterations, so you can see the number of iterations that has been completed, and how many left.
+  cat("iteration = ", i , "\n") # Shows the progress of iterations, so you can see the number of iterations that has been completed, and how many left.
 }
 
 M.mouse.a.CL  = MC.mouse.a.CL %>% apply(1,mean) # get the mean value of MC.rat.a.CA
@@ -776,7 +788,7 @@ MC.mouse.CS.plot <- cbind(
   ))))
 )
 # for plotting the kidney results
-Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_100nm.csv")  
+Obs.A1 <- read.csv(file ="dataset/tk/mouse/R_input_mouse_study1_100nm_short.csv")  
 
 p.r.L <- 
   ggplot() + 
@@ -850,7 +862,7 @@ R <-gelman.diag(combinedchains) # Gel man convergence diagnosis
 
 mcmc_trace (
   combinedchains,
-  pars =names(theta.MCMC[1:30]),
+  pars =names(theta.MCMC[1:length(pars.mouse [-which_sig])]),
   size = 0.5,
   facet_args = list(nrow = 5)) +
   ggplot2::scale_color_brewer()
@@ -859,7 +871,7 @@ ggsave(paste(folder,"trace_plot.png"))
 
 mcmc_dens_overlay(
   combinedchains,
-  pars = names(theta.MCMC[1:30]),
+  pars = names(theta.MCMC[1:length(pars.mouse [-which_sig])]),
   size=0.5,
   facet_args = list(nrow=5) + ggplot2::scale_color_brewer()
 )
@@ -867,390 +879,3 @@ ggsave(paste(folder,"prob_chains.png"))
 
 write.csv(R[1],paste(folder,"r.csv"))
 
-
-#----------------------------------------old---------------------------------------------
-#-------------------------------------Fitting with A1 dataset---------------
-Obs.A1 <- read.csv(file ="C:/switchdriver/dataset/tk/mouse/R_input_mouse_study1_4nm.csv")
-
-
-
-Fit.Result.A1<- modFit(f=MCcost, p=params2fit, obs=Obs.A1, method ="Nelder-Mead", 
-                       control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A1)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A1=MCcost(Fit.Result.A1$par, obs=Obs.A1)$residuals$res      ## Check the residual for each time points
-sum(res.A1^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A1 = pred.mouse(par=Fit.Result.A1$par)
-                                
-plot.A1=
-    ggplot() +
-    geom_line(data  = Fitted_output.A1, aes(Time,CL), col="firebrick", lwd=2)+
-    geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot.A1
-
-plot.A1_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A1_Lung
-
-plot.A1_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot.A1_Kidney
-
-plot.A1_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot.A1_Spleen
-
-
-plot.A1_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A1_Brain
-
-plot.A1_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1, aes(Time,CG), col="firebrick", lwd=2)
-plot.A1_GI
-
-#-------------------fitting with only liver data-------------------
-Obs.A1_L <- data.frame(Time=Obs.A1['Time'], 
-                       CL=Obs.A1['CL'])
-
-Fit.Result.A1_L<- modFit(f=MCcost, p=params2fit, obs=Obs.A1_L, method ="Nelder-Mead", 
-                       control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A1_L)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A1_L=MCcost(Fit.Result.A1_L$par, obs=Obs.A1)$residuals$res      ## Check the residual for each time points
-sum(res.A1_L^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A1_L = pred.mouse(par=Fit.Result.A1_L$par)
-
-plot_L.A1=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1_L, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot_L.A1
-
-plot_L.A1_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1_L, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A1_Lung
-
-plot_L.A1_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1_L, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot_L.A1_Kidney
-
-plot_L.A1_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1_L, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot_L.A1_Spleen
-
-
-plot_L.A1_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1_L, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A1    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A1_Brain
-
-plot_L.A1_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A1_L, aes(Time,CG), col="firebrick", lwd=2)
-plot_L.A1_GI
-
-
-
-
-
-#-------------------fitting with only A2 liver data-------------------
-Obs.A2_L <- data.frame(Time=Obs.A2['Time'], 
-                       CL=Obs.A2['CL'])
-
-Fit.Result.A2_L<- modFit(f=MCcost, p=params2fit, obs=Obs.A2_L, method ="Nelder-Mead", 
-                         control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A2_L)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A2_L=MCcost(Fit.Result.A2_L$par, obs=Obs.A2)$residuals$res      ## Check the residual for each time points
-sum(res.A2_L^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A2_L = pred.mouse(par=Fit.Result.A2_L$par)
-
-plot_L.A2=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_L, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot_L.A2
-
-plot_L.A2_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_L, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot_L.A2_Lung
-
-plot_L.A2_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_L, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot_L.A2_Kidney
-
-plot_L.A2_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_L, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot_L.A2_Spleen
-
-
-plot_L.A2_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_L, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A2_Brain
-
-plot_L.A2_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_L, aes(Time,CG), col="firebrick", lwd=2)
-plot_L.A2_GI
-
-
-
-
-
-#-------------------fitting with only spleen data-------------------
-Obs.A2_S <- data.frame(Time=Obs.A2['Time'], 
-                       CL=Obs.A2['CS'])
-
-Fit.Result.A2_S<- modFit(f=MCcost, p=params2fit, obs=Obs.A2_S, method ="Nelder-Mead", 
-                         control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A2_S)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A2_S=MCcost(Fit.Result.A2_S$par, obs=Obs.A2_S)$residuals$res      ## Check the residual for each time points
-sum(res.A2_S^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A2_S = pred.mouse(par=Fit.Result.A2_S$par)
-
-plot_S.A2=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_S, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot_S.A2
-
-plot_S.A2_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_S, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A2_Lung
-
-plot_S.A2_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_S, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot_S.A2_Kidney
-
-plot_S.A2_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_S, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot_S.A2_Spleen
-
-
-plot_S.A2_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_S, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A2_Brain
-
-plot_S.A2_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_S, aes(Time,CG), col="firebrick", lwd=2)
-plot_S.A2_GI
-
-
-
-
-
-
-
-#-------------------fitting with only brain data-------------------
-# only brain has the different shape with experiment data, but the results of other organ 
-# becomes worse when we change to use only brain data
-Obs.A2_B <- data.frame(Time=Obs.A2['Time'], 
-                       CL=Obs.A2['CB'])
-
-Fit.Result.A2_B<- modFit(f=MCcost, p=params2fit, obs=Obs.A2_B, method ="Nelder-Mead", 
-                         control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A2_B)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A2_B=MCcost(Fit.Result.A2_B$par, obs=Obs.A2_B)$residuals$res      ## Check the residual for each time points
-sum(res.A2_B^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A2_B = pred.mouse(par=Fit.Result.A2_B$par)
-
-plot_B.A2=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_B, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot_B.A2
-
-plot_B.A2_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_B, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A2_Lung
-
-plot_B.A2_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_B, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot_B.A2_Kidney
-
-plot_B.A2_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_B, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot_B.A2_Spleen
-
-
-plot_B.A2_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_B, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A2    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot_B.A2_Brain
-
-plot_B.A2_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A2_B, aes(Time,CG), col="firebrick", lwd=2)
-plot_B.A2_GI
-
-
-
-
-
-
-
-#---------------------------Fitting with A3 dataset-----------------------------
-Obs.A3 <- read.csv(file ="C:/switchdriver/dataset/tk/mouse/R_input_mouse_study1_100nm.csv")   
-
-Fit.Result.A3<- modFit(f=MCcost, p=params2fit, obs=Obs.A3, method ="Nelder-Mead", 
-                       control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A3)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A3=MCcost(Fit.Result.A3$par, obs=Obs.A3)$residuals$res      ## Check the residual for each time points
-sum(res.A3^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A3 = pred.mouse(par=Fit.Result.A3$par)
-
-plot.A3=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot.A3
-
-plot.A3_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A3_Lung
-
-plot.A3_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot.A3_Kidney
-
-plot.A3_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot.A3_Spleen
-
-plot.A3_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A3_Brain
-
-plot.A3_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3, aes(Time,CG), col="firebrick", lwd=2)
-plot.A3_GI
-#-------------------fitting with only liver data-------------------
-Obs.A3_L <- data.frame(Time=Obs.A3['Time'], 
-                       CL=Obs.A3['CL'])
-
-Fit.Result.A3_L<- modFit(f=MCcost, p=params2fit, obs=Obs.A3_L, method ="Nelder-Mead", 
-                         control = nls.lm.control(nprint=1)) #"Nelder-Mead"
-
-summary(Fit.Result.A3_L)                           ## Summary of fit
-#exp(Fit.Result$par)                          ## Get the arithmetic value out of the log domain
-res.A3_L=MCcost(Fit.Result.A3_L$par, obs=Obs.A3)$residuals$res      ## Check the residual for each time points
-sum(res.A3_L^2)                                    ## Total residuals 
-
-# Calculated the model output with fitted parameters
-
-Fitted_output.A3_L = pred.mouse(par=Fit.Result.A3_L$par)
-
-plot_L.A3=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3_L, aes(Time,CL), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CL), size=2.5) + ylab("Concentration") 
-plot_L.A3
-
-plot_L.A3_Lung=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3_L, aes(Time,Clung), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, Clung), size=2.5) + ylab("Concentration") 
-plot.A3_Lung
-
-plot_L.A3_Kidney=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3_L, aes(Time,CK), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CK), size=2.5) + ylab("Concentration") 
-plot_L.A3_Kidney
-
-plot_L.A3_Spleen=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3_L, aes(Time,CS), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CS), size=2.5) + ylab("Concentration") 
-plot_L.A3_Spleen
-
-
-plot_L.A3_Brain=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3_L, aes(Time,CB), col="firebrick", lwd=2)+
-  geom_point(data = Obs.A3    , aes(Time, CB), size=2.5) + ylab("Concentration") 
-plot.A3_Brain
-
-plot_L.A3_GI=
-  ggplot() +
-  geom_line(data  = Fitted_output.A3_L, aes(Time,CG), col="firebrick", lwd=2)
-plot_L.A3_GI
-
-#------------------------------------------------------------------------------------

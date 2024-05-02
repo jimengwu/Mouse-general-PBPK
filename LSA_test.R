@@ -21,21 +21,49 @@ solveBact <- function(pars) {
 
 out <- solveBact(pars)
 
-plot(out$time, out$Bact, ylim = range(c(out$Bact, out$Sub)),
+plot(out$time, out$Bact, ylim = range(c(out$Bact, out$Sub)), 
      xlab = "time, hour", ylab = "molC/m3", type = "l", lwd = 2)
-lines(out$time, out$Sub, lty = 2, lwd = 2)
-lines(out$time, out$Sub + out$Bact)
-
+lines(out$time, out$Sub, lty = 2, lwd = 2)+
+lines(out$time, out$Sub + out$Bact)+
 legend("topright", c("Bacteria", "Glucose", "TOC"),
        lty = c(1, 2, 1), lwd = c(2, 2, 1))
+
+###-------------------------------my function----------
+pars_new <- pars
+percentage = 0.000001
+pars_new$dB <- pars$dB * (1+percentage)
+
+# New simulation with updated parameters
+out_new <- solveBact(pars_new)
+
+delta = out_new - out
+
+# Calculate the sensitivity as a change relative to parameter change
+lsa <- (delta/1) / (percentage)
+
+###------------------------------------
+
 
 ## sensitivity functions
 SnsBact <- sensFun(func = solveBact, parms = pars,
                    sensvar = "Bact", varscale = 1)
+
+par(mfrow = c(1, 2))  # Set the layout to 1 row and 2 columns
+plot(out$time, lsa$Bact, type = "l", 
+     xlab = "Time, hour", ylab = "Sensitivity", 
+     main = "Sensitivity of Parameter - My function",
+     col = 1:ncol(lsa))
+plot(SnsBact$x, SnsBact$dB, 
+     xlab = "Time, hour", ylab = "Sensitivity of gmax", 
+     main = "Sensitivity of Parameter -  SensFun",
+     col = "blue", type = "l")
+
 head(SnsBact)
 plot(SnsBact)
 plot(SnsBact, type = "b", pch = 15:19, col = 2:6, 
      main = "Sensitivity all vars")
+
+#-------------------summary function------
 
 summary(SnsBact)
 plot(summary(SnsBact))
