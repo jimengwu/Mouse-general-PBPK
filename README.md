@@ -22,3 +22,6 @@ The approach integrates **Bayesian analysis** with **Markov Chain Monte Carlo (M
 2. Install required R packages, indicating in the model files.   
 3. Load the model script into your R environment.
 
+## Paper link
+https://doi.org/10.1021/acsnano.5c03040
+
